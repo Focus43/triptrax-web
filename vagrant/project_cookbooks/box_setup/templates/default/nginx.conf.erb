@@ -1,0 +1,22 @@
+server {
+    listen <%= node[:box_setup][:web][:http_port][:from] %> default;
+    server_name <%= node[:box_setup][:server_name] %>;
+
+    access_log off;
+    error_log off;
+
+    keepalive_timeout 10;
+
+    sendfile off;
+
+    location / {
+        # auto-wrap jsonp requests with the callback name
+        #if ($request_uri ~* "callback="){
+        #    echo_before_body $arg_CALLBACK(;
+        #    echo_after_body ');';
+        #}
+
+    	root <%= node[:box_setup][:web][:doc_root] %>;
+    	try_files $uri /index.html;
+    }
+}

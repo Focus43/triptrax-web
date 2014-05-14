@@ -1,0 +1,57 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  # Box
+  config.vm.box = "precise64-pristine"
+  # Box URL
+  config.vm.box_url = "http://focus-43.com/files/1913/8670/0974/precise64-pristine.box"
+  # Port forwarding
+  config.vm.network :forwarded_port, guest: 4000, host: 4000
+
+  # Share an additional folder to the guest VM.
+  config.vm.synced_folder "../", "/home/vagrant/app"
+
+  # Chef provisioner : built based on box_settings declarations
+  config.vm.provision :chef_solo do |chef|
+    # Default cookbooks
+    chef.cookbooks_path = ['cookbooks', 'project_cookbooks']
+    chef.add_recipe :apt
+    chef.add_recipe 'git'
+    chef.add_recipe 'ruby_build'
+    chef.add_recipe 'rbenv::user'
+    chef.add_recipe 'build-essential'
+    chef.add_recipe 'nodejs'
+    chef.add_recipe 'nodejs::npm'
+    chef.add_recipe 'box_setup::gruntjs'
+
+    # Default attributes
+    _attributes = {
+        # Git
+        :git => {
+            :prefix => '/usr/local'
+        },
+        :rbenv => {
+            :user_installs => [{
+                 :user => 'vagrant',
+                 :rubies => ["2.1.2"],
+                 :global => "2.1.2",
+                 :gems => {
+                     "2.1.2" => [{:name => 'bundler'}, {:name => 'compass' }]
+                 }
+             }]
+        }
+    }
+
+    # Add the box_setup cookbook (custom for this) after everything else
+    chef.add_recipe 'box_setup'
+
+    # pass the attributes to chef.json
+    chef.json = _attributes
+
+  end
+
+  config.vm.provision :shell, :inline => "sudo apt-get update && sudo apt-get -y install build-essential ruby-compass && sudo /opt/ruby/bin/gem install jekyll rdiscount --no-ri --no-rdoc"
+
+end

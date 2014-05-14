@@ -1,0 +1,6 @@
+name				"box_setup"
+maintainer			"Jon Hartman"
+maintainer_email	"jon@focus-43.com"
+license				"MIT"
+description			"Accompanies the Vagrant-RubyGeneral build files"
+version				"0.01"
