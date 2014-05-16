@@ -21,9 +21,11 @@ module.exports = function(grunt) {
                     destPrefix: 'js/libs'
                 },
                 files: {
-                    'jquery.min.js': 'jquery/dist/jquery.min.js',
+                    'zepto/zepto.js': 'zeptojs/src/zepto.js',
+                    'zepto/event.js': 'zeptojs/src/event.js',
+                    'zepto/ie.js': 'zeptojs/src/ie.js',
                     'bootstrap.min.js': 'bootstrap-css/js/bootstrap.min.js',
-                    'masonry.js': 'masonry/dist/masonry.pkgd.min.js'
+                    'underscore.js': 'underscore/underscore.js'
                 }
             },
             scss: {
@@ -31,13 +33,13 @@ module.exports = function(grunt) {
                     destPrefix: 'stylesheets'
                 },
                 files: {
-                    'bootstrap.css': 'bootstrap-css/css/bootstrap.min.css',
-                    'font-awesome.css': 'fontawesome/css/font-awesome.css'
+                    'scss/font-awesome': 'components-font-awesome/scss',
+                    'bootstrap.css': 'bootstrap-css/css/bootstrap.css'
                 }
             },
             folders: {
                 files: {
-                    'fonts': ['fontawesome/fonts', 'bootstrap-css/fonts']
+                    'fonts': ['components-font-awesome/fonts', 'bootstrap-css/fonts']
                 }
             }
         },
@@ -57,9 +59,12 @@ module.exports = function(grunt) {
             },
             build: {
                 src: [
-                    'js/libs/jquery.min.js',
+                    'js/libs/zepto/zepto.js',
+                    'js/libs/zepto/ie.js',
+                    'js/libs/zepto/event.js',
+                    'js/libs/underscore.js',
+                    'js/libs/parse-1.2.18.js',
                     'js/libs/bootstrap.min.js',
-                    'js/libs/masonry.js',
                     'js/main.js'
                 ],
                 dest: 'assets/js/<%= filename %>.js'
@@ -93,7 +98,7 @@ module.exports = function(grunt) {
         // JShint (linter)
         jshint: {
             options: {
-                curly: true,
+//                curly: true,
                 eqeqeq: true,
                 immed: true,
                 latedef: true,
@@ -101,7 +106,7 @@ module.exports = function(grunt) {
                 noarg: true,
                 sub: true,
                 undef: true,
-                //unused: true,
+                lastsemic: true,
                 boss: true,
                 eqnull: true,
                 browser: true,
@@ -109,8 +114,9 @@ module.exports = function(grunt) {
                 jquery: true,
                 globals: {
                     modernizr: true,
-                    getStyleProperty: true,
-                    getSize: true
+                    Parse: true,
+                    Backbone: true,
+                    _: true
                 }
             },
 //            all: ['Gruntfile.js', 'js/*.js'],
@@ -146,7 +152,8 @@ module.exports = function(grunt) {
         compass: {
             dev: {
                 options: {
-                    sassDir: ['sass'],
+                    banner: false,
+                    sassDir: ['stylesheets/scss'],
                     cssDir: ['stylesheets'],
                     fontsDir: ["fonts"],
                     environment: 'development'
@@ -154,7 +161,7 @@ module.exports = function(grunt) {
             },
             release: {
                 options: {
-                    sassDir: ['sass'],
+                    sassDir: ['stylesheets/scss'],
                     cssDir: ['stylesheets'],
                     environment: 'production'
                 }
@@ -163,7 +170,7 @@ module.exports = function(grunt) {
 
         // concat stylesheets
         concat_css: {
-            "assets/css/styles.css" : ["stylesheets/bootstrap.css", "stylesheets/font-awesome.css", "stylesheets/styles.css"]
+            "assets/css/styles.css" : ["stylesheets/**.css"]
         },
 
         watch: {
@@ -175,13 +182,13 @@ module.exports = function(grunt) {
                 files: '<%= jshint.lib_test.files.src %>',
                 tasks: ['jshint', 'concat']
             },
+            compass: {
+                files: ['stylesheets/scss/*.{scss,sass}'],
+                tasks: ['compass:dev']
+            },
             styles: {
                 files: ["stylesheets/bootstrap.css", "stylesheets/font-awesome.css", "stylesheets/styles.css"],
                 tasks: ['concat_css']
-            },
-            compass: {
-                files: ['sass/*.{scss,sass}'],
-                tasks: ['compass:dev']
             },
             jekyllSources: {
                 files: [

@@ -1,5 +1,5 @@
 {
-  "name": "SuperRunt",
+  "name": "TripTrax",
   "version": "0.1.0",
   "ignore": [
     "**/.*",
@@ -9,7 +9,9 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap-css": "",
-    "fontawesome": "~4.0.3"
+      "bootstrap-css": "",
+      "fontawesome": "~4.0.3",
+      "zeptojs": "",
+      "underscore": "~1.6.0"
   }
 }
