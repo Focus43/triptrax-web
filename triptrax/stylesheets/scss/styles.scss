@@ -2,3 +2,19 @@
 body { background: url("../img/background.png")}
 
 thead { font-weight: bold; }
+
+#trips-list {
+  tr td.change { display: none; }
+  tr.editing {
+    td.change { display: table-cell;
+      .input-group {
+        span { font-size: 12px; }
+      }
+      .btn { float: left;
+        i.fa { font-size: 1.0em; }
+      }
+    }
+    td.current { display: none; }
+  }
+}
+

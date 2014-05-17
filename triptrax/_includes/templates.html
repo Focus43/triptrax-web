@@ -28,6 +28,17 @@
                     <div id="user-info">
                         Signed in as <%= Parse.User.current().get("username") %> (<a href="#" class="log-out">Log out</a>)
                     </div>
+                    <button class="btn btn-info new">New Trip</button>
+                    <table id="new-table" class="table table-condensed table-hover">
+                        <thead>
+                        <tr><td></td><td>Date</td><td>Title</td><td>Start</td><td>End</td></tr>
+                        </thead>
+                        <tbody id="new-trip">
+                        <tr><td colspan="5">
+
+                        </td><td>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -41,7 +52,14 @@
                         <thead>
                             <tr><td></td><td>Date</td><td>Title</td><td>Start</td><td>End</td></tr>
                         </thead>
-                        <tbody id="trips-list"></tbody>
+                        <tbody id="trips-list">
+                            <tr><td colspan="5">
+                                <div id="progress-bar" class="progress progress-striped active">
+                                    <div class="progress-bar"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                                    </div>
+                                </div>
+                            </td><td>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -51,17 +69,65 @@
 
 <script type="text/template" id="trip-template">
 
-    <td>
+    <td class="current">
         <div class="btn-group">
-            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+            <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
                 Action <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" role="menu">
                 <li><a href="#" class="edit-me">Edit</a></li>
-                <li><a href="#">Delete</a></li>
+                <li><a href="#" class="delete-me">Delete</a></li>
             </ul>
         </div>
     </td>
-    <td><%= _.template.formatdate(date) %></td><td><%= title %></td><td><%= startOdometer %></td><td><%= endOdometer %></td>
+    <td class="change">
+        <button class="btn btn-success save" style="margin-right: 2px;"><i class="fa fa-check-circle fa-inverse"></i></button>
+        <button class="btn btn-danger cancel" ><i class="fa fa-times-circle fa-inverse"></i></button>
+    </td>
 
+    <td class="current"><%= _.template.formatdate(date) %></td>
+    <td class="current"><%= title %></td>
+    <td class="current"><%= startOdometer %></td>
+    <td class="current"><%= endOdometer %></td>
+
+    <td class="change" colspan="4">
+        <form>
+        <div class="row">
+            <div class="col-md-8 col-sm-12">
+                <div class="row">
+                    <div class="col-md-5 col-sm-6">
+                        <div class="input-group">
+                            <span class="input-group-addon">Date</span>
+                            <input type="date" class="form-control" name="date" placeholder="mm/dd/yyyy" value="<%= _.template.formatdatevalue(date) %>">
+                        </div>
+                    </div>
+                    <div class="col-md-7 col-sm-6">
+                        <div class="input-group">
+                            <span class="input-group-addon">Title</span>
+                            <input type="text" class="form-control" name="title" placeholder="Title" value="<%= title %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="row">
+                    <div class="col-md-6 col-sm-6">
+                        <div class="input-group">
+                            <span class="input-group-addon">Start</span>
+                            <input type="number" class="form-control" name="startOdometer" value="<%= startOdometer %>" placeholder="1234">
+                            <!--<span class="input-group-addon">miles</span>-->
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <div class="input-group">
+                            <span class="input-group-addon">End</span>
+                            <input type="number" class="form-control" name="endOdometer" value="<%= endOdometer %>" placeholder="1234">
+                            <!--<span class="input-group-addon">miles</span>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </form>
+    </td>
 </script>

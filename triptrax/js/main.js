@@ -5,6 +5,26 @@
  * Time: 3:22 PM
  */
 
+$.fn.serializeObject = function() {
+    var o = Object.create(null),
+        elementMapper = function(element) {
+            element.name = $.camelCase(element.name);
+            return element;
+        },
+        appendToResult = function(i, element) {
+            var node = o[element.name];
+
+            if ('undefined' !== typeof node && node !== null) {
+                o[element.name] = node.push ? node.push(element.value) : [node, element.value];
+            } else {
+                o[element.name] = element.value;
+            }
+        };
+
+    $.each($.map(this.serializeArray(), elementMapper), appendToResult);
+    return o;
+};
+
 $(function() {
 
     Parse.initialize("Vd1Qs3EyW8r7JebCa7n9X6WXjvMxa711HJfKvWqJ", "q8fq25b1iNZyzyRqdIZHpXQKY5R4mTWU1QLeA374");
@@ -14,8 +34,10 @@ $(function() {
     var Trip = Parse.Object.extend("Trip", {
         // Default attributes
         defaults: {
-            title: "empty trip...",
-            done: false
+            title: "",
+            date: new Date(),
+            startOdometer: 0,
+            endOdometer: 0
         },
 
         // Ensure that each todo created has `content`.
@@ -36,7 +58,12 @@ $(function() {
 
         // Trips are sorted by date
         comparator: function(trip) {
-            return trip.get('date');
+            return -trip.get('date');
+        },
+
+        initialize: function() {
+            this.on('change:date', function() { this.sort() }, this);
+            this.on('destroy', function() { this.sort() }, this);
         }
     });
 
@@ -105,29 +132,23 @@ $(function() {
 
     var TripView = Parse.View.extend({
 
-        //... is a list tag.
         tagName:  "tr",
 
         // Cache the template function for a single item.
         template: _.template($('#trip-template').html()),
 
-        // The DOM events specific to an item.
         events: {
-            "click .edit-me"              : "edit"
-//            ,
-//            "dblclick label.todo-content" : "edit",
-//            "click .todo-destroy"   : "clear",
-//            "keypress .edit"      : "updateOnEnter",
-//            "blur .edit"          : "close"
+            "click .edit-me"    : "edit",
+            "click .delete-me"  : "delete",
+            "click .save"       : "save",
+            "click .cancel"     : "cancel",
+            "keypress .editing" : "updateOnEnter"
         },
 
-        // The TodoView listens for changes to its model, re-rendering. Since there's
-        // a one-to-one correspondence between a Trip and a TripView in this
-        // app, we set a direct reference on the model for convenience.
         initialize: function() {
-            _.bindAll(this, 'render', 'close', 'remove');
-            this.model.bind('change', this.render);
-            this.model.bind('destroy', this.remove);
+            _.bindAll(this, 'render', 'cancel', 'delete', 'save', 'edit', 'updateOnEnter');
+            this.model.bind('save', this.render);
+            this.model.bind('delete', this.remove);
         },
 
         // Re-render the contents of the trip item.
@@ -136,41 +157,45 @@ $(function() {
             return this;
         },
 
-        // Toggle the `"done"` state of the model.
-        toggleDone: function() {
-            this.model.toggle();
-        },
-
-        // Switch this view into `"editing"` mode, displaying the input field.
+        // Switch this view into editing
         edit: function() {
-            console.log("edit me!");
-//            $(this.el).addClass("editing");
+            $(this.el).addClass("editing");
 //            this.input.focus();
         },
 
-        // Close the `"editing"` mode, saving changes to the todo.
-        close: function() {
-            this.model.save({content: this.input.val()});
+        // Close the editing mode, saving changes to the trip.
+        save: function() {
+            var data = $(this.el).find("form").serializeObject();
+            data.date = new Date(data.date);
+            data.startOdometer = parseInt(data.startOdometer);
+            data.endOdometer = parseInt(data.endOdometer);
+            data.user = Parse.User.current();
+            this.model.setACL(new Parse.ACL(Parse.User.current()));
+            this.model.save(data);
             $(this.el).removeClass("editing");
         },
 
         // If you hit `enter`, we're through editing the item.
         updateOnEnter: function(e) {
-            if (e.keyCode === 13) this.close();
+            if (e.keyCode === 13) this.save();
         },
 
         // Remove the item, destroy the model.
         delete: function() {
             this.model.destroy();
-        }
+        },
 
+        // Close the editing mode without changes to the trip.
+        cancel: function() {
+            $(this.el).removeClass("editing");
+        }
     });
 
     var ManageTripsView = Parse.View.extend({
         events: {
 //            "keypress #new-todo":  "createOnEnter",
 //            "click #clear-completed": "clearCompleted",
-//            "click #toggle-all": "toggleAllComplete",
+            "click .new": "newTrip",
             "click .log-out": "logOut"
 //            "click ul#filters a": "selectFilter"
         },
@@ -185,7 +210,6 @@ $(function() {
             // Main todo management template
             this.$el.html(_.template($("#manage-trips-template").html()));
 
-            this.input = this.$("#new-trip");
             this.allCheckbox = this.$("#toggle-all")[0];
 
             // Create our collection of Todos
@@ -220,13 +244,20 @@ $(function() {
 //            this.allCheckbox.checked = !remaining;
         },
 
-        addOne: function(todo) {
-            var view = new TripView({model: todo});
+        newTrip: function() {
+            var view = new TripView({model: new Trip()});
+            $("#new-table").show();
+            $("#new-trip").append(view.render().el);
+        },
+
+        addOne: function(trip) {
+            var view = new TripView({model: trip});
             $("#trips-list").append(view.render().el);
         },
 
         addAll: function(collection, filter) {
             $("#trips-list").html("");
+            $('#progress-bar').remove();
             this.trips.forEach(this.addOne);
         },
 
@@ -275,11 +306,11 @@ $(function() {
 
 // Formatters
 _.template.formatdate = function (stamp) {
-    var d = new Date(stamp.iso),
-        fragments = [
-            d.getDate(),
-            d.getMonth() + 1,
-            d.getFullYear()
-        ];
-    return fragments.join('/');
+    var d = new Date(stamp.iso);
+    return d.toLocaleDateString();
+};
+
+_.template.formatdatevalue = function (stamp) {
+    var fragments = stamp.iso.split("T");
+    return fragments[0];
 };

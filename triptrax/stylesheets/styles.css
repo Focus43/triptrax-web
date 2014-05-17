@@ -7,3 +7,28 @@ body {
 thead {
   font-weight: bold;
 }
+
+/* line 7, scss/styles.scss */
+#trips-list tr td.change {
+  display: none;
+}
+/* line 9, scss/styles.scss */
+#trips-list tr.editing td.change {
+  display: table-cell;
+}
+/* line 11, scss/styles.scss */
+#trips-list tr.editing td.change .input-group span {
+  font-size: 12px;
+}
+/* line 13, scss/styles.scss */
+#trips-list tr.editing td.change .btn {
+  float: left;
+}
+/* line 14, scss/styles.scss */
+#trips-list tr.editing td.change .btn i.fa {
+  font-size: 1.0em;
+}
+/* line 17, scss/styles.scss */
+#trips-list tr.editing td.current {
+  display: none;
+}
