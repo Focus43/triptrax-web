@@ -1,5 +1,5 @@
 # If nodejs is enabled, install Bower?
-if  node[:box_setup][:nodejs][:install]
+if  node[:nodejs]
   execute "Installing Bower via NPM" do
     cwd		'/home/vagrant/app'
     user	'root'

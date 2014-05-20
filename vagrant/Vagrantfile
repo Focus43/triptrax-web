@@ -42,6 +42,9 @@ Vagrant.configure("2") do |config|
                      "2.1.2" => [{:name => 'bundler'}, {:name => 'compass' }]
                  }
              }]
+        },
+        :nodejs => {
+            :npm => "1.4.10"
         }
     }
 
