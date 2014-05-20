@@ -5944,23 +5944,28 @@ div.homepage .media .media-body {
   margin-bottom: 10px;
 }
 /* line 67, scss/styles.scss */
+div.homepage .media div.info-media div {
+  width: 50px;
+  text-align: center;
+}
+/* line 68, scss/styles.scss */
 div.homepage .media img.iphone {
   height: 50%;
   width: 50%;
 }
 
 @-webkit-keyframes border-pulsate {
-  /* line 72, scss/styles.scss */
+  /* line 73, scss/styles.scss */
   0% {
     background-color: rgba(246, 89, 19, 0);
   }
 
-  /* line 73, scss/styles.scss */
+  /* line 74, scss/styles.scss */
   50% {
     background-color: rgba(246, 89, 19, 0.6);
   }
 
-  /* line 74, scss/styles.scss */
+  /* line 75, scss/styles.scss */
   100% {
     background-color: rgba(246, 89, 19, 0);
   }
