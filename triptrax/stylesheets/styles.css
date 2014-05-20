@@ -160,7 +160,7 @@ div.homepage .media .media-body {
 }
 /* line 67, scss/styles.scss */
 div.homepage .media div.info-media div {
-  width: 50px;
+  width: 50%;
   text-align: center;
 }
 /* line 68, scss/styles.scss */
