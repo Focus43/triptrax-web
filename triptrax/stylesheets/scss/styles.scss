@@ -3,6 +3,40 @@ body { background: url("../img/background.png")}
 
 thead { font-weight: bold; }
 
+.navbar { border-radius: 0;
+  li div.user { padding: 15px 0;color: #fff; }
+}
+
+.navbar-inverse {
+  .navbar-brand, a { color: #fff !important; }
+  .navbar-brand:hover, a:hover { color: #999 !important; }
+}
+
+.panel.entry .panel-body { padding: 0 15px; }
+
+ul.pagination {
+  li > a { color: #5bc0de;
+    &:hover { color: #3f9be6 !important; }
+  }
+  li.active.disabled > a { background-color: #5bc0de; border-color: #5bc0de; color: #fff;
+    &:hover { color: #fff !important; }
+  }
+}
+
+div.login { text-align: center;
+  .signup-form { border-top: 1px solid #ccc; }
+  .login-form, .signup-form { padding: 20px 20px 45px 20px;
+    h2 { margin-top: 0px !important;margin-bottom: 15px; }
+    .row { margin: 0 !important;
+      input { width: 100%;margin-bottom: 7px;line-height: 24px;padding: 0 7px;font-size: 17px; }
+    }
+    .btn { width: 100%;font-size: 17px;margin-top: 10px; }
+  }
+}
+
+.btn.new { float: right;width: 25%;margin-bottom: 10px;font-weight: bold; }
+div.alert.alert-warning.savefirst { float: left; width: 70%; }
+
 #trips-list {
   tr td.change { display: none; }
   tr.editing {
@@ -16,5 +50,15 @@ thead { font-weight: bold; }
     }
     td.current { display: none; }
   }
+}
+
+@-webkit-keyframes border-pulsate {
+  0%   { background-color: rgba(246, 89, 19, 0); }
+  50% { background-color: rgba(246, 89, 19, 0.6); }
+  100%   { background-color: rgba(246, 89, 19, 0); }
+}
+tr.saveme {
+  -webkit-animation: border-pulsate 2s;
+  -webkit-animation-iteration-count: 1;
 }
 

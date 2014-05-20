@@ -1,4 +1,4 @@
-/*! My Website - Build v0.1.0 (2014-05-16)
+/*! My Website - Build v0.1.0 (2014-05-19)
 Author: Stine Richvoldsen  */
 //     Zepto.js
 //     (c) 2010-2014 Thomas Fuchs
@@ -658,6 +658,7 @@ var Zepto = (function() {
         height: Math.round(obj.height)
       }
     },
+
     css: function(property, value){
       if (arguments.length < 2) {
         var element = this[0], computedStyle = getComputedStyle(element, '')
@@ -1567,6 +1568,87 @@ window.$ === undefined && (window.$ = Zepto)
     serialize(params, obj, traditional)
     return params.join('&').replace(/%20/g, '+')
   }
+})(Zepto)
+;
+//     Zepto.js
+//     (c) 2010-2014 Thomas Fuchs
+//     Zepto.js may be freely distributed under the MIT license.
+
+// The following code is heavily inspired by jQuery's $.fn.data()
+
+;(function($){
+  var data = {}, dataAttr = $.fn.data, camelize = $.camelCase,
+    exp = $.expando = 'Zepto' + (+new Date()), emptyArray = []
+
+  // Get value from node:
+  // 1. first try key as given,
+  // 2. then try camelized key,
+  // 3. fall back to reading "data-*" attribute.
+  function getData(node, name) {
+    var id = node[exp], store = id && data[id]
+    if (name === undefined) return store || setData(node)
+    else {
+      if (store) {
+        if (name in store) return store[name]
+        var camelName = camelize(name)
+        if (camelName in store) return store[camelName]
+      }
+      return dataAttr.call($(node), name)
+    }
+  }
+
+  // Store value under camelized key on node
+  function setData(node, name, value) {
+    var id = node[exp] || (node[exp] = ++$.uuid),
+      store = data[id] || (data[id] = attributeData(node))
+    if (name !== undefined) store[camelize(name)] = value
+    return store
+  }
+
+  // Read all "data-*" attributes from a node
+  function attributeData(node) {
+    var store = {}
+    $.each(node.attributes || emptyArray, function(i, attr){
+      if (attr.name.indexOf('data-') == 0)
+        store[camelize(attr.name.replace('data-', ''))] =
+          $.zepto.deserializeValue(attr.value)
+    })
+    return store
+  }
+
+  $.fn.data = function(name, value) {
+    return value === undefined ?
+      // set multiple values via object
+      $.isPlainObject(name) ?
+        this.each(function(i, node){
+          $.each(name, function(key, value){ setData(node, key, value) })
+        }) :
+        // get value from first element
+        this.length == 0 ? undefined : getData(this[0], name) :
+      // set value on all elements
+      this.each(function(){ setData(this, name, value) })
+  }
+
+  $.fn.removeData = function(names) {
+    if (typeof names == 'string') names = names.split(/\s+/)
+    return this.each(function(){
+      var id = this[exp], store = id && data[id]
+      if (store) $.each(names || store, function(key){
+        delete store[names ? camelize(this) : key]
+      })
+    })
+  }
+
+  // Generate extended `remove` and `empty` functions
+  ;['remove', 'empty'].forEach(function(methodName){
+    var origFn = $.fn[methodName]
+    $.fn[methodName] = function() {
+      var elements = this.find('*')
+      if (methodName === 'remove') elements = elements.add(this)
+      elements.removeData()
+      return origFn.call(this)
+    }
+  })
 })(Zepto)
 ;
 //     Underscore.js 1.6.0
@@ -12055,16 +12137,19 @@ $(function() {
     var Trip = Parse.Object.extend("Trip", {
         // Default attributes
         defaults: {
-            title: "",
+            title: "New Trip",
             date: new Date(),
             startOdometer: 0,
             endOdometer: 0
         },
 
-        // Ensure that each todo created has `content`.
+        // Ensure that each trip created has date and title.
         initialize: function() {
             if (!this.get("title")) {
-                this.set({"title": this.defaults.title});
+                this.set(this.defaults.title);
+            }
+            if (!this.get("date")) {
+                this.set(this.defaults.date);
             }
         }
     });
@@ -12085,6 +12170,7 @@ $(function() {
         initialize: function() {
             this.on('change:date', function() { this.sort() }, this);
             this.on('destroy', function() { this.sort() }, this);
+            this.on('add', function() { this.sort() }, this);
         }
     });
 
@@ -12092,8 +12178,8 @@ $(function() {
     // -----------------
     var LogInView = Parse.View.extend({
         events: {
-            "submit form.login-form": "logIn",
-            "submit form.signup-form": "signUp"
+            "click .btn.login": "logIn",
+            "click .btn.signup": "signUp"
         },
 
         el: ".container",
@@ -12104,6 +12190,7 @@ $(function() {
         },
 
         logIn: function(e) {
+            e.preventDefault();
             var self = this;
             var username = this.$("#login-username").val();
             var password = this.$("#login-password").val();
@@ -12112,7 +12199,7 @@ $(function() {
                 success: function(user) {
                     new ManageTripsView();
                     self.undelegateEvents();
-//                    delete self;
+                    self = null;
                 },
 
                 error: function(user, error) {
@@ -12123,6 +12210,7 @@ $(function() {
         },
 
         signUp: function(e) {
+            e.preventDefault();
             var self = this;
             var username = this.$("#signup-username").val();
             var password = this.$("#signup-password").val();
@@ -12175,6 +12263,7 @@ $(function() {
         // Re-render the contents of the trip item.
         render: function() {
             $(this.el).html(this.template(this.model.toJSON()));
+            $(this.el).attr("id", this.model.cid);
             return this;
         },
 
@@ -12186,14 +12275,35 @@ $(function() {
 
         // Close the editing mode, saving changes to the trip.
         save: function() {
+            var elm =  $(this.el);
+            // reset potential messages etc
+            $(this.el).removeClass("saveme");
+            $("div.alert-warning.savefirst").addClass("hidden");
+
+            $(this.el).find(".fa-check-circle").addClass("fa-spin");
+            $(this.el).find(".fa-check-circle").addClass("fa-spinner");
+            $(this.el).find(".fa-check-circle").removeClass("fa-check-circle");
+
             var data = $(this.el).find("form").serializeObject();
             data.date = new Date(data.date);
             data.startOdometer = parseInt(data.startOdometer);
             data.endOdometer = parseInt(data.endOdometer);
             data.user = Parse.User.current();
             this.model.setACL(new Parse.ACL(Parse.User.current()));
-            this.model.save(data);
-            $(this.el).removeClass("editing");
+            this.model.save(data, {
+                success: function(trip) {
+                    $("tbody#trips-list tr").first().removeClass("editing");
+                    elm.find(".fa-spinner").addClass("fa-check-circle");
+                    elm.find(".fa-spinner").removeClass("fa-spin");
+                    elm.find(".fa-spinner").removeClass("fa-spinner");
+                },
+                error: function(trip, error) {
+                    // Execute any logic that should take place if the save fails.
+                    // error is a Parse.Error with an error code and description.
+                    alert('Failed to create new object, with error code: ' + error.description);
+                }
+            });
+
         },
 
         // If you hit `enter`, we're through editing the item.
@@ -12209,16 +12319,23 @@ $(function() {
         // Close the editing mode without changes to the trip.
         cancel: function() {
             $(this.el).removeClass("editing");
+            $('#new-trip').html("");
+            $('#new-table').hide();
         }
     });
 
     var ManageTripsView = Parse.View.extend({
+
+        queryCount: 0,
+        queryLimit: 20,
+        querySkip: 0,
+        pages: 1,
+        currentPage: 1,
+
         events: {
-//            "keypress #new-todo":  "createOnEnter",
-//            "click #clear-completed": "clearCompleted",
             "click .new": "newTrip",
-            "click .log-out": "logOut"
-//            "click ul#filters a": "selectFilter"
+            "click .log-out": "logOut",
+            "click a.pagination": "goToPage"
         },
 
         el: $(".container"),
@@ -12226,28 +12343,49 @@ $(function() {
         initialize: function() {
             var self = this;
 
-            _.bindAll(this, 'addOne', 'addAll', 'render', 'logOut');
+            _.bindAll(this, 'addOne', 'addAll', 'render', 'logOut', 'goToPage');
 
-            // Main todo management template
-            this.$el.html(_.template($("#manage-trips-template").html()));
+            // Main trip management template
+            this.template = _.template($("#manage-trips-template").html());
+            this.$el.html(this.template);
 
             this.allCheckbox = this.$("#toggle-all")[0];
 
             // Create our collection of Todos
             this.trips = new TripsList();
 
-            // Setup the query for the collection to look for todos from the current user
+            // Setup the query for the collection
             this.trips.query = new Parse.Query(Trip);
             this.trips.query.equalTo("user", Parse.User.current());
+            this.trips.query.descending("date");
+
+            this.trips.query.count({
+                success: function(count) {
+                    self.queryCount = count;
+                    self.paginationAndFetch();
+                },
+                error: function(error) {
+                    // if there's an error, it's likely because Parse times out when over 1000...
+                    self.queryCount = 1000;
+                    self.paginationAndFetch();
+                }
+            });
 
             this.trips.bind('add',     this.addOne);
             this.trips.bind('reset',   this.addAll);
             this.trips.bind('all',     this.render);
 
-            // Fetch all the trips for this user
-            this.trips.fetch();
+            // set the header user info
+            $("ul.nav.navbar-right").html('<li><div class="user pull-left">Hi, ' + Parse.User.current().get("username") + '</div><a href="#" class="log-out pull-right">(Log out)</a></li>');
 
             state.on("change", this.filter, this);
+
+            $(".log-out").on('click', function () {
+                Parse.User.logOut();
+                App.render();
+                // change the header user info
+                $("ul.nav.navbar-right").html('<li><a href="/" class="log-in">Log In</a></li>');
+            });
         },
 
         render: function() {
@@ -12265,20 +12403,65 @@ $(function() {
 //            this.allCheckbox.checked = !remaining;
         },
 
-        newTrip: function() {
-            var view = new TripView({model: new Trip()});
-            $("#new-table").show();
-            $("#new-trip").append(view.render().el);
+        paginationAndFetch: function () {
+            this.trips.query.skip(this.querySkip);
+            this.trips.query.limit(this.queryLimit);
+
+            this.pages = Math.ceil(this.queryCount / this.queryLimit);
+            this.currentPage = (this.queryLimit - this.querySkip) / this.queryLimit;
+            // pagination template
+            this.paginationTemplate = _.template($("#pagination-template").html());
+            this.$el.find("ul.pagination").html(this.paginationTemplate({ currentPage: this.currentPage, range: _.range( 1, this.pages + 1 ) }));
+
+            $("a.paginate").on('click', this.goToPage);
+            // Fetch all the trips for this user
+            this.trips.fetch();
+        },
+
+        newTrip: function( e ) {
+
+            var _openTrip = {},
+                _t = null;
+
+            if ( this.trips.some( function (trip) {
+                if ( trip.isNew() ) {
+                    _openTrip = trip;
+                    return true;
+                }
+            }) ) {
+
+                var _elm = $(this.el).find("tr#" + _openTrip.cid);
+                _elm.addClass("saveme");
+                $("div.alert-warning.savefirst").removeClass("hidden");
+
+                var _reset = function () {
+                    _elm.removeClass("saveme");
+                    _elm = null;
+                };
+                _t = setTimeout(_reset, 2000);
+
+            } else {
+                var trip = new Trip();
+                this.trips.add(trip);
+            }
         },
 
         addOne: function(trip) {
             var view = new TripView({model: trip});
-            $("#trips-list").append(view.render().el);
+            // render trip if not already fired by other event  TODO: this is heavy, must update
+            if ( $("#trips-list tr#" + trip.cid).length === 0 ) {
+                $("#trips-list").append(view.render().el);
+                if ( trip.isNew() ) {
+                    $(view.$el).addClass("editing");
+                }
+            }
         },
 
         addAll: function(collection, filter) {
             $("#trips-list").html("");
             $('#progress-bar').remove();
+            this.template.pages = this.pages;
+            this.template.currentPage = this.currentPage;
             this.trips.forEach(this.addOne);
         },
 
@@ -12286,6 +12469,15 @@ $(function() {
             Parse.User.logOut();
             new LogInView();
             this.undelegateEvents();
+        },
+
+        goToPage: function (e) {
+            e.preventDefault();
+            var pageNum = e.target.text;
+
+            this.querySkip = (pageNum - 1) * this.queryLimit;
+            this.currentPage = pageNum;
+            this.paginationAndFetch();
         }
 
     });
@@ -12301,8 +12493,6 @@ $(function() {
 
     var AppView = Parse.View.extend({
 
-        // Instead of generating a new element, bind to the existing skeleton of
-        // the App already present in the HTML.
         el: $("#triptraxapp"),
 
         initialize: function() {
@@ -12310,7 +12500,7 @@ $(function() {
         },
 
         render: function() {
-            if (Parse.User.current()) {
+            if ( Parse.User.current() ) {
                 new ManageTripsView();
             } else {
                 new LogInView();
@@ -12320,9 +12510,7 @@ $(function() {
 
     var state = new AppState();
 
-    // Finally, we kick things off by creating the **App**.
     var App = new AppView();
-
 });
 
 // Formatters
@@ -12335,3 +12523,4 @@ _.template.formatdatevalue = function (stamp) {
     var fragments = stamp.iso.split("T");
     return fragments[0];
 };
+

@@ -26,6 +26,7 @@ module.exports = function(grunt) {
                     'zepto/ie.js': 'zeptojs/src/ie.js',
                     'zepto/form.js': 'zeptojs/src/form.js',
                     'zepto/ajax.js': 'zeptojs/src/ajax.js',
+                    'zepto/data.js': 'zeptojs/src/data.js',
                     'bootstrap.min.js': 'bootstrap-css/js/bootstrap.min.js',
                     'underscore.js': 'underscore/underscore.js'
                 }
@@ -66,6 +67,7 @@ module.exports = function(grunt) {
                     'js/libs/zepto/event.js',
                     'js/libs/zepto/form.js',
                     'js/libs/zepto/ajax.js',
+                    'js/libs/zepto/data.js',
                     'js/libs/underscore.js',
                     'js/libs/parse-1.2.18.js',
                     'js/libs/bootstrap.min.js',

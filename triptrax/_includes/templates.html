@@ -1,53 +1,47 @@
 <!-- LOGIN/ SIGNUP -->
+
 <script type="text/template" id="login-template">
-    <header id="header"></header>
-    <div class="login">
-        <form class="login-form">
-            <h2>Log In</h2>
-            <div class="error alert alert-danger" style="display:none"></div>
-            <input type="text" id="login-username" placeholder="Username" />
-            <input type="password" id="login-password" placeholder="Password" />
-            <button>Log In</button>
-        </form>
-
-        <form class="signup-form">
-            <h2>Sign Up</h2>
-            <div class="error alert alert-danger" style="display:none"></div>
-            <input type="text" id="signup-username" placeholder="Username" />
-            <input type="password" id="signup-password" placeholder="Create a Password" />
-            <button>Sign Up</button>
-        </form>
-    </div>
-</script>
-
-<script type="text/template" id="manage-trips-template">
-    <div class="row">
+    <div class="row" style="padding-top: 25px;">
         <div class="col-md-12">
-            <div class="panel panel-default">
+            <div class="panel panel-default entry">
                 <div class="panel-body">
-                    <div id="user-info">
-                        Signed in as <%= Parse.User.current().get("username") %> (<a href="#" class="log-out">Log out</a>)
-                    </div>
-                    <button class="btn btn-info new">New Trip</button>
-                    <table id="new-table" class="table table-condensed table-hover">
-                        <thead>
-                        <tr><td></td><td>Date</td><td>Title</td><td>Start</td><td>End</td></tr>
-                        </thead>
-                        <tbody id="new-trip">
-                        <tr><td colspan="5">
+                    <div class="login row">
+                        <div class="col-md-2 col-xs-1"> </div>
+                            <form class="login-form bg-success">
+                                <h2 class="text-success">Log In</h2>
+                                <div class="row">
+                                    <div class="col-md-12"><div class="error alert alert-danger" style="display:none"></div></div>
+                                    <div class="col-md-6"><input type="text" id="login-username" placeholder="Username" /></div>
+                                    <div class="col-md-6"><input type="password" id="login-password" placeholder="Password" /></div>
+                                    <div class="col-md-12"><button class="btn btn-success login">Log In</button></div>
+                                </div>
+                            </form>
 
-                        </td><td>
-                        </tbody>
-                    </table>
+                            <form class="signup-form bg-info">
+                                <h2 class="text-info">Sign Up</h2>
+                                <div class="row">
+                                    <div class="col-md-12"><div class="error alert alert-danger" style="display:none"></div></div>
+                                    <div class="col-md-6"><input type="text" id="signup-username" placeholder="Username" /></div>
+                                    <div class="col-md-6"><input type="password" id="signup-password" placeholder="Create a Password" /></div>
+                                    <div class="col-md-12"><button class="btn btn-info signup">Sign Up</button></div>
+                            </form>
+
+                        <div class="col-md-2 col-xs-1"> </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+</script>
+
+<script type="text/template" id="manage-trips-template">
 
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-body">
+                    <div class="alert alert-warning savefirst hidden">Please, save unsaved trip first.</div>
+                    <button class="btn btn-info new" >New Trip</button>
                     <table class="table table-condensed table-hover">
                         <thead>
                             <tr><td></td><td>Date</td><td>Title</td><td>Start</td><td>End</td></tr>
@@ -61,10 +55,21 @@
                             </td><td>
                         </tbody>
                     </table>
+
+                    <div style="text-align: center;"><ul class="pagination"></ul></div>
                 </div>
             </div>
         </div>
     </div>
+</script>
+
+<script type="text/template" id="pagination-template">
+    <% _.each( range, function(i) { %>
+        <% if (currentPage === i) { %>
+            <li class="active disabled">
+        <% } else { %>
+            <li>
+        <% } %> <a class="paginate" data-page="<%= i %>" href="#"><%= i %></a></li> <% }); %>
 </script>
 
 <script type="text/template" id="trip-template">
