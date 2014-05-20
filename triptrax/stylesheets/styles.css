@@ -136,26 +136,46 @@ div.alert.alert-warning.savefirst {
   widht: 100%;
   background-color: #5bc0de;
   margin-top: -20px;
+  margin-bottom: 20px;
   padding: 30px;
   color: #fff;
+  text-align: center;
 }
 /* line 60, scss/styles.scss */
-.tt-header .appstore {
-  padding: 30px 0;
+.tt-header h1 {
+  font-size: 31px;
+}
+/* line 61, scss/styles.scss */
+.tt-header p {
+  font-size: 20px;
+}
+
+/* line 65, scss/styles.scss */
+div.homepage .media {
+  text-align: center;
+}
+/* line 66, scss/styles.scss */
+div.homepage .media .media-body {
+  margin-bottom: 10px;
+}
+/* line 67, scss/styles.scss */
+div.homepage .media img.iphone {
+  height: 50%;
+  width: 50%;
 }
 
 @-webkit-keyframes border-pulsate {
-  /* line 64, scss/styles.scss */
+  /* line 72, scss/styles.scss */
   0% {
     background-color: rgba(246, 89, 19, 0);
   }
 
-  /* line 65, scss/styles.scss */
+  /* line 73, scss/styles.scss */
   50% {
     background-color: rgba(246, 89, 19, 0.6);
   }
 
-  /* line 66, scss/styles.scss */
+  /* line 74, scss/styles.scss */
   100% {
     background-color: rgba(246, 89, 19, 0);
   }

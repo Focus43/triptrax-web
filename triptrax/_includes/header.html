@@ -15,19 +15,14 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
             <ul class="nav navbar-nav">
-                {% for page in site.pages %}
-                <li><a class="page-link" href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a></li>
-                {% endfor %}
+                <li><a class="page-link" href="/triplog/">Trip Log</a></li>
+                <!--{% for page in site.pages %}-->
+                <!--<li><a class="page-link" href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a></li>-->
+                <!--{% endfor %}-->
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="/" class="log-in">Log In</a></li>
-                <!--<form class="navbar-form navbar-left" role="login">-->
-                    <!--<div class="form-group">-->
-                        <!--<input type="text" class="form-control" placeholder="Search">-->
-                    <!--</div>-->
-                    <!--<button type="submit" class="btn btn-default">Submit</button>-->
-                <!--</form>-->
+                <li><a href="/triplog/" class="log-in">Log In</a></li>
             </ul>
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->

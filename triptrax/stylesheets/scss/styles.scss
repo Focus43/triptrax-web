@@ -56,8 +56,16 @@ div.alert.alert-warning.savefirst { float: left; width: 70%; }
   }
 }
 
-.tt-header { widht: 100%; background-color: #5bc0de;margin-top: -20px;padding: 30px; color: #fff;
-  .appstore { padding: 30px 0; }
+.tt-header { widht: 100%; background-color: #5bc0de;margin-top: -20px;margin-bottom: 20px;padding: 30px; color: #fff; text-align: center;
+  h1 { font-size: 31px;  }
+  p { font-size: 20px; }
+}
+
+div.homepage {
+  .media { text-align: center;
+    .media-body { margin-bottom: 10px; }
+    img.iphone { height: 50%; width: 50%; }
+  }
 }
 
 @-webkit-keyframes border-pulsate {
