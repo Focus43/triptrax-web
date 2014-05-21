@@ -1,61 +1,254 @@
+# encoding: utf-8
+
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
 
-  # Box
+  # COMMONLY USED SETTINGS : NORMALLY DON'T CUSTOMIZE BELOW THIS HASH
+  box_settings = {
+      :project_name => 'custom_app',
+      # Memory available for the virtual machine
+      :memory_cap => '384',
+      # Install Redis?
+      :redis => false,
+      # Install NodeJS?
+      :nodejs => {
+          :install  => true,
+          :gruntjs  => true,
+          :bower    => true,
+          :npm      => {
+              :auto_install_packages => true,
+              :package_json_location => '/home/vagrant/app'
+          }
+      },
+      # Web settings
+      :web => {
+          # Port to forward from vagrant -> your machine (eg: http://localhost:8080)
+          :http_port => {:from => 3000, :to => 3000},
+          # Install a server? options: 'nginx', 'apache', or false for none (ie. false to use Rails internal server)
+          :server => false,
+          # Only applicable if :server = 'nginx|apache'
+          :doc_root => '/home/vagrant/app'
+      },
+      # Ruby settings for this box (using rbenv, to install more rubies, modify per-project)
+      :ruby_settings => {
+          # Ruby version to install for the Vagrant user
+          :version => "2.1.2",
+          # Gems to install out of the gate
+          :gems => [{:name => 'bundler'}, {:name => 'compass' }]
+      },
+      # PostgreSQL settings
+      :postgres => {
+          # Install PostgreSQL?
+          :install => false,
+          # Password for login
+          :password => "vagrant",
+          # Port to forward on your local system (GUI client)
+          :port => {:from => 5432, :to => 5432},
+          # Install hstore extensions?
+          :hstore => false,
+          # Install GIS extensions?
+          :gis => false
+      },
+      # Extra ports to forward (ie. for livereload)
+      :port_forwards => [
+          {:from => 35729, :to => 35729}
+      # etc, etc as pairs
+      ]
+  }
+
+
+  ##################################################################################
+  ### REMAINING VAGRANT STUFF : USUALLY DON'T NEED TO DO ANYTHING!
+  ##################################################################################
   config.vm.box = "precise64-pristine"
   # Box URL
   config.vm.box_url = "http://focus-43.com/files/1913/8670/0974/precise64-pristine.box"
-  # Port forwarding
-  config.vm.network :forwarded_port, guest: 4000, host: 4000
-
-  # Share an additional folder to the guest VM.
+  # Apache
+  config.vm.network :forwarded_port, guest: box_settings[:web][:http_port][:from], host: box_settings[:web][:http_port][:to], auto_correct: true
+  # PostgreSQL (if applicable)
+  if (box_settings[:postgres][:install])
+    config.vm.network :forwarded_port, guest: box_settings[:postgres][:port][:from], host: box_settings[:postgres][:port][:to], auto_correct: true
+  end
+  # Setup any misc port forwards
+  if (! box_settings[:port_forwards].empty? )
+    box_settings[:port_forwards].each do |pairs|
+      config.vm.network :forwarded_port, guest: pairs[:from], host: pairs[:to], auto_correct: true
+    end
+  end
+  # Mount shared folder
   config.vm.synced_folder "../", "/home/vagrant/app"
+  # Vagrant port forwarding
+  config.ssh.forward_agent = true
+  # Make VirtualBox GUI display the VM name as root project folder
+  begin
+    config.vm.provider "virtualbox" do |v|
+      v.name = File.basename(File.expand_path("../"))
+    end
+  rescue
+    $stdout.puts "Unable to rename Vagrant machine; VirtualBox will display a generic name..."
+  end
+  # Resource usage caps for VM
+  begin
+    config.vm.provider "virtualbox" do |v|
+      #v.customize ['modifyvm', :id, '--memory', box_settings[:memory_cap]]
+    end
+  rescue
+    $stdout.puts "Unable to set resource usage for VirtualBox; proceeding with defaults..."
+  end
+
+  # Ensure utf8 locales (for compiling postgres and GIS extensions specifically)
+  #config.vm.provision :shell, :path => "shell_scripts/configure_vm_locales.sh"
 
   # Chef provisioner : built based on box_settings declarations
   config.vm.provision :chef_solo do |chef|
     # Default cookbooks
     chef.cookbooks_path = ['cookbooks', 'project_cookbooks']
     chef.add_recipe :apt
+    #chef.add_recipe 'openssl'
     chef.add_recipe 'git'
     chef.add_recipe 'ruby_build'
     chef.add_recipe 'rbenv::user'
     chef.add_recipe 'build-essential'
-    chef.add_recipe 'nodejs'
-    chef.add_recipe 'nodejs::npm'
-    chef.add_recipe 'box_setup::gruntjs'
-    chef.add_recipe 'box_setup::bower'
 
     # Default attributes
     _attributes = {
+        # Add the box_settings to the json attributes
+        :box_setup => box_settings,
         # Git
         :git => {
             :prefix => '/usr/local'
         },
+        # Rbenv shit pulled from box_settings
         :rbenv => {
             :user_installs => [{
-                 :user => 'vagrant',
-                 :rubies => ["2.1.2"],
-                 :global => "2.1.2",
-                 :gems => {
-                     "2.1.2" => [{:name => 'bundler'}, {:name => 'compass' }]
-                 }
-             }]
-        },
-        :nodejs => {
-            :npm => "1.4.10"
+                                   :user => 'vagrant',
+                                   :rubies => [box_settings[:ruby_settings][:version]],
+                                   :global => box_settings[:ruby_settings][:version],
+                                   :gems => {
+                                       box_settings[:ruby_settings][:version] => box_settings[:ruby_settings][:gems]
+                                   }
+                               }]
         }
     }
+
+    # Include NodeJS?
+    if box_settings[:nodejs][:install]
+      chef.add_recipe 'nodejs'
+      chef.add_recipe 'nodejs::npm'
+      #chef.add_recipe 'box_setup::npm'
+
+      _attributes[:nodejs] = {
+          :npm => '1.4.4'
+      }
+    end
+
+    # Include Redis?
+    if box_settings[:redis]
+      chef.add_recipe 'redis'
+
+      _attributes[:redis] = {
+          :bind => "127.0.0.1",
+          :port => "6379",
+          :config_path => "/etc/redis/redis.conf",
+          :daemonize => "yes",
+          :timeout => "300",
+          :loglevel => "notice"
+      }
+    end
+
+    # Use Nginx as the web server?
+    if box_settings[:web][:server] == 'nginx'
+      chef.add_recipe 'nginx'
+      chef.add_recipe 'box_setup::nginx'
+
+      _attributes[:nginx] = {
+          :dir => "/etc/nginx",
+          :log_dir => "/var/log/nginx",
+          :binary => "/usr/sbin/nginx",
+          :user => "vagrant",
+          :init_style => "runit",
+          :pid => "/var/run/nginx.pid",
+          :worker_connections => "1024",
+          # customizations
+          :default_site_enabled => false
+      }
+    end
+
+    # User Apache as the web server?
+    if box_settings[:web][:server] == 'apache'
+      chef.add_recipe 'apache2'
+      chef.add_recipe 'box_setup::apache'
+
+      _attributes[:apache] = {
+          :default_site_enabled => false,
+          :dir => "/etc/apache2",
+          :log_dir => "/var/log/apache2",
+          :error_log => "error.log",
+          :user => "vagrant",
+          :group => "vagrant",
+          :binary => "/usr/sbin/apache2",
+          :cache_dir => "/var/cache/apache2",
+          :pid_file => "/var/run/apache2.pid",
+          :lib_dir => "/usr/lib/apache2",
+          :listen_ports => ["80"],
+          :contact => "ops@example.com",
+          :timeout => "300",
+          :keepalive => "On",
+          :keepaliverequests => "100",
+          :keepalivetimeout => "5",
+          :default_modules => [
+              'mod_mime',
+              'mod_expires',
+              'mod_php5',
+              'mod_rewrite',
+              'mod_deflate',
+              'mod_headers',
+              'mod_ssl'
+          ]
+      }
+    end
+
+    # Install PostgreSQL?
+    if box_settings[:postgres][:install]
+      chef.add_recipe 'postgresql'
+      chef.add_recipe 'postgresql::client'
+      chef.add_recipe 'postgresql::server'
+      # Include hstore extension?
+      if box_settings[:postgres][:gis]
+        chef.add_recipe 'postgresql::contrib'
+      end
+      # Include GIS extension?
+      if box_settings[:postgres][:gis]
+        chef.add_recipe 'postgresql::postgis'
+      end
+      chef.add_recipe 'box_setup::postgres'
+
+      _attributes[:postgresql] = {
+          :port => box_settings[:postgres][:port][:from],
+          :listen_addresses => '*',
+          :users => [{
+                         :username => 'vagrant',
+                         :password => box_settings[:postgres][:password],
+                         :superuser => true,
+                         :createdb => false,
+                         :login => true
+                     }],
+          :pg_hba => [
+              {:type => 'local', :db => 'all', :user => 'postgres', :addr => '', :method => 'ident'},
+              {:type => 'local', :db => 'all', :user => 'all', :addr => '', :method => 'trust'},
+              {:type => 'host', :db => 'all', :user => 'all', :addr => '0.0.0.0/0', :method => 'trust'},
+              {:type => 'host', :db => 'all', :user => 'all', :addr => '::1/0', :method => 'trust'}
+          ]
+      }
+    end
 
     # Add the box_setup cookbook (custom for this) after everything else
     chef.add_recipe 'box_setup'
 
-    # pass the attributes to chef.json
+    # ***NOW*** pass the attributes to chef.json
     chef.json = _attributes
 
   end
-
-  config.vm.provision :shell, :inline => "sudo apt-get update && sudo apt-get -y install build-essential ruby-compass && sudo /opt/ruby/bin/gem install jekyll rdiscount --no-ri --no-rdoc"
-
 end

@@ -1,4 +1,3 @@
-if node[:nodejs]
   # Fix the self-signed cert issue for NPM; https://twitter.com/npmjs/status/439279809307242496
   execute "Auto-correcting NPM Self-Signed Cert Issue..." do
     cwd   '/home/vagrant'
@@ -16,4 +15,3 @@ if node[:nodejs]
       action  :run
     end
   end
-end
