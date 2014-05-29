@@ -71,6 +71,9 @@ module.exports = function(grunt) {
                     'js/libs/underscore.js',
                     'js/libs/parse-1.2.18.js',
                     'js/libs/bootstrap.min.js',
+                    'js/libs/modernizr.custom.js',
+                    'js/addons.js',
+                    'js/modal.js',
                     'js/main.js'
                 ],
                 dest: 'assets/js/<%= filename %>.js'
@@ -122,7 +125,9 @@ module.exports = function(grunt) {
                     modernizr: true,
                     Parse: true,
                     Backbone: true,
-                    _: true
+                    _: true,
+                    Modernizr: true,
+                    Modal: true
                 }
             },
 //            all: ['Gruntfile.js', 'js/*.js'],

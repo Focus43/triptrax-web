@@ -5,26 +5,6 @@
  * Time: 3:22 PM
  */
 
-$.fn.serializeObject = function() {
-    var o = Object.create(null),
-        elementMapper = function(element) {
-            element.name = $.camelCase(element.name);
-            return element;
-        },
-        appendToResult = function(i, element) {
-            var node = o[element.name];
-
-            if ('undefined' !== typeof node && node !== null) {
-                o[element.name] = node.push ? node.push(element.value) : [node, element.value];
-            } else {
-                o[element.name] = element.value;
-            }
-        };
-
-    $.each($.map(this.serializeArray(), elementMapper), appendToResult);
-    return o;
-};
-
 $(function() {
 
     Parse.initialize("Vd1Qs3EyW8r7JebCa7n9X6WXjvMxa711HJfKvWqJ", "q8fq25b1iNZyzyRqdIZHpXQKY5R4mTWU1QLeA374");
@@ -50,7 +30,6 @@ $(function() {
             }
         }
     });
-
 
     // Trips Collection
     // ---------------
@@ -139,7 +118,6 @@ $(function() {
     var TripView = Parse.View.extend({
 
         tagName:  "tr",
-
         // Cache the template function for a single item.
         template: _.template($('#trip-template').html()),
 
@@ -155,6 +133,7 @@ $(function() {
             _.bindAll(this, 'render', 'cancel', 'delete', 'save', 'edit', 'updateOnEnter');
             this.model.bind('save', this.render);
             this.model.bind('delete', this.remove);
+            this.modal = new Modal();
         },
 
         // Re-render the contents of the trip item.
@@ -187,12 +166,22 @@ $(function() {
             data.endOdometer = parseInt(data.endOdometer);
             data.user = Parse.User.current();
             this.model.setACL(new Parse.ACL(Parse.User.current()));
+            $("#mileage-total").html('<i class="fa fa-spinner fa-spin"></i>');
             this.model.save(data, {
                 success: function(trip) {
                     $("tbody#trips-list tr").first().removeClass("editing");
                     elm.find(".fa-spinner").addClass("fa-check-circle");
                     elm.find(".fa-spinner").removeClass("fa-spin");
                     elm.find(".fa-spinner").removeClass("fa-spinner");
+                    // Update total mileage
+                    Parse.Cloud.run('totalMileage', { userid: data.user.id, year: new Date().getFullYear() }, {
+                      success: function (result) {
+                        $("#mileage-total").html(result + " miles");
+                      },
+                      error: function (error) {
+                        // console.log(error);
+                      }
+                    });
                 },
                 error: function(trip, error) {
                     // Execute any logic that should take place if the save fails.
@@ -210,7 +199,35 @@ $(function() {
 
         // Remove the item, destroy the model.
         delete: function() {
-            this.model.destroy();
+            this.modal.toggleModal( $("#usure"));
+            var self = this;
+
+            $("#usure .btn.yes").one('click', function () {
+                self.modal.toggleModal();
+                $(self.el).addClass('waiting');
+                self.model.destroy({
+                  wait: true,
+                  success: function ( data ) {
+                      $("#mileage-total").html('<i class="fa fa-spinner fa-spin"></i>');
+                      Parse.Cloud.run('totalMileage', { userid: data.attributes.user.id, year: new Date().getFullYear() }, {
+                        success: function (result) {
+                            $("#mileage-total").html(result + " miles");
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                      });
+                  },
+                  error: function ( error ) {
+                      console.log( error );
+                      self.model.elm.removeClass('waiting');
+                      self.model.elm.addClass('danger');
+                      self = null;
+                  }
+                });
+            });
+
+            $("#usure .btn.cancel").one('click', this.modal.toggleModal);
         },
 
         // Close the editing mode without changes to the trip.
@@ -246,7 +263,10 @@ $(function() {
             this.template = _.template($("#manage-trips-template").html());
             this.$el.html(this.template);
 
-            this.allCheckbox = this.$("#toggle-all")[0];
+            // Modal setup
+            this.modal = new Modal();
+
+            // this.allCheckbox = this.$("#toggle-all")[0];
 
             // Create our collection of Todos
             this.trips = new TripsList();
@@ -286,18 +306,10 @@ $(function() {
         },
 
         render: function() {
-//            var done = this.trips.done().length;
-//            var remaining = this.trips.remaining().length;
-
-//            this.$('#trips-stats').html(this.statsTemplate({
-//                total:      this.todos.length,
-//                done:       done,
-//                remaining:  remaining
-//            }));
-
-//            this.delegateEvents();
-//
-//            this.allCheckbox.checked = !remaining;
+            this.modal.init($('button.overlay-close'));
+            var _currentYear = new Date().getFullYear(); console.log(_currentYear);
+            Parse.Cloud.run('totalMileage', { userid: Parse.User.current().id, year: _currentYear }, {
+              success: function (result) { $("#mileage-total").html(result + " miles"); }});
         },
 
         paginationAndFetch: function () {
@@ -316,27 +328,22 @@ $(function() {
         },
 
         newTrip: function( e ) {
-
             var _openTrip = {},
                 _t = null;
-
             if ( this.trips.some( function (trip) {
                 if ( trip.isNew() ) {
                     _openTrip = trip;
                     return true;
                 }
             }) ) {
-
                 var _elm = $(this.el).find("tr#" + _openTrip.cid);
                 _elm.addClass("saveme");
                 $("div.alert-warning.savefirst").removeClass("hidden");
-
                 var _reset = function () {
                     _elm.removeClass("saveme");
                     _elm = null;
                 };
                 _t = setTimeout(_reset, 2000);
-
             } else {
                 var trip = new Trip();
                 this.trips.add(trip);
@@ -371,12 +378,41 @@ $(function() {
         goToPage: function (e) {
             e.preventDefault();
             var pageNum = e.target.text;
-
             this.querySkip = (pageNum - 1) * this.queryLimit;
             this.currentPage = pageNum;
             this.paginationAndFetch();
         }
-
+        // ,
+        //
+        // toggleModal: function () {
+        //     var _transitions = this.support.transitions,
+        //         _overlay = this.overlay,
+        //         _supporTrans = this.support.transitions,
+        //         _transEndEventName = this.transEndEventName;
+        //
+        //     if( _overlay.hasClass('open') ) {
+        //         console.log("closing");
+        //         _overlay.removeClass('open');
+        //         _overlay.addClass('close');
+        //         var onEndTransitionFn = function( ev ) {
+        //             if( _transitions ) {
+        //                 if( ev.propertyName !== 'visibility' ) return;
+        //                 this.removeEventListener( _transEndEventName, onEndTransitionFn );
+        //             }
+        //             _overlay.removeClass('close');
+        //         };
+        //
+        //         if( _supporTrans ) {
+        //             _overlay.on( _transEndEventName, onEndTransitionFn );
+        //         } else {
+        //             onEndTransitionFn();
+        //         }
+        //     } else if( _overlay.hasClass('close') ) {
+        //         console.log("opening");
+        //         _overlay.removeClass('close');
+        //         _overlay.addClass('open');
+        //     }
+        // }
     });
 
     // The Application
@@ -420,4 +456,3 @@ _.template.formatdatevalue = function (stamp) {
     var fragments = stamp.iso.split("T");
     return fragments[0];
 };
-

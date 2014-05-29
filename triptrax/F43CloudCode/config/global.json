@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "MileTracker": {
+            "applicationId": "Vd1Qs3EyW8r7JebCa7n9X6WXjvMxa711HJfKvWqJ", 
+            "masterKey": "aA3welYbeDdF1AN51eXGJPF3A8X4tu093Kzx1vkL"
+        }, 
+        "_default": {
+            "link": "MileTracker"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.2.18"
+    }
+}

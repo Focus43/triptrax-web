@@ -5786,6 +5786,7 @@ button.close {
 /* line 2, scss/styles.scss */
 body {
   background: url("../img/background.png");
+  min-height: 100%;
 }
 
 /* line 4, scss/styles.scss */
@@ -5793,71 +5794,71 @@ thead {
   font-weight: bold;
 }
 
-/* line 6, scss/styles.scss */
+/* line 7, scss/styles.scss */
 .navbar {
   border-radius: 0;
 }
-/* line 7, scss/styles.scss */
+/* line 8, scss/styles.scss */
 .navbar li div.user {
   padding: 15px 0;
   color: #fff;
 }
 
-/* line 11, scss/styles.scss */
+/* line 12, scss/styles.scss */
 .navbar-inverse .navbar-brand, .navbar-inverse a {
   color: #fff !important;
 }
-/* line 12, scss/styles.scss */
+/* line 13, scss/styles.scss */
 .navbar-inverse .navbar-brand:hover, .navbar-inverse a:hover {
   color: #999 !important;
 }
 
-/* line 15, scss/styles.scss */
+/* line 16, scss/styles.scss */
 .panel.entry .panel-body {
   padding: 0 15px;
 }
 
-/* line 18, scss/styles.scss */
+/* line 19, scss/styles.scss */
 ul.pagination li > a {
   color: #5bc0de;
 }
-/* line 19, scss/styles.scss */
+/* line 20, scss/styles.scss */
 ul.pagination li > a:hover {
   color: #3f9be6 !important;
 }
-/* line 21, scss/styles.scss */
+/* line 22, scss/styles.scss */
 ul.pagination li.active.disabled > a {
   background-color: #5bc0de;
   border-color: #5bc0de;
   color: #fff;
 }
-/* line 22, scss/styles.scss */
+/* line 23, scss/styles.scss */
 ul.pagination li.active.disabled > a:hover {
   color: #fff !important;
 }
 
-/* line 26, scss/styles.scss */
+/* line 27, scss/styles.scss */
 div.login {
   text-align: center;
 }
-/* line 27, scss/styles.scss */
+/* line 28, scss/styles.scss */
 div.login .signup-form {
   border-top: 1px solid #ccc;
 }
-/* line 28, scss/styles.scss */
+/* line 29, scss/styles.scss */
 div.login .login-form, div.login .signup-form {
   padding: 20px 20px 45px 20px;
 }
-/* line 29, scss/styles.scss */
+/* line 30, scss/styles.scss */
 div.login .login-form h2, div.login .signup-form h2 {
   margin-top: 0px !important;
   margin-bottom: 15px;
 }
-/* line 30, scss/styles.scss */
+/* line 31, scss/styles.scss */
 div.login .login-form .row, div.login .signup-form .row {
   margin: 0 !important;
 }
-/* line 31, scss/styles.scss */
+/* line 32, scss/styles.scss */
 div.login .login-form .row input, div.login .signup-form .row input {
   width: 100%;
   margin-bottom: 7px;
@@ -5865,14 +5866,14 @@ div.login .login-form .row input, div.login .signup-form .row input {
   padding: 0 7px;
   font-size: 17px;
 }
-/* line 33, scss/styles.scss */
+/* line 34, scss/styles.scss */
 div.login .login-form .btn, div.login .signup-form .btn {
   width: 100%;
   font-size: 17px;
   margin-top: 10px;
 }
 
-/* line 37, scss/styles.scss */
+/* line 38, scss/styles.scss */
 .btn.new {
   float: right;
   width: 25%;
@@ -5880,43 +5881,47 @@ div.login .login-form .btn, div.login .signup-form .btn {
   font-weight: bold;
 }
 
-/* line 38, scss/styles.scss */
+/* line 39, scss/styles.scss */
 div.alert.alert-warning.savefirst {
   float: left;
   width: 70%;
 }
 
-/* line 41, scss/styles.scss */
+/* line 42, scss/styles.scss */
 #trips-list tr.saveme {
   -webkit-animation: border-pulsate 2s;
   -webkit-animation-iteration-count: 1;
 }
-/* line 45, scss/styles.scss */
+/* line 46, scss/styles.scss */
 #trips-list tr td.change {
   display: none;
 }
-/* line 47, scss/styles.scss */
+/* line 48, scss/styles.scss */
 #trips-list tr.editing td.change {
   display: table-cell;
 }
-/* line 49, scss/styles.scss */
+/* line 50, scss/styles.scss */
 #trips-list tr.editing td.change .input-group span {
   font-size: 12px;
 }
-/* line 51, scss/styles.scss */
+/* line 52, scss/styles.scss */
 #trips-list tr.editing td.change .btn {
   float: left;
 }
-/* line 52, scss/styles.scss */
+/* line 53, scss/styles.scss */
 #trips-list tr.editing td.change .btn i.fa {
   font-size: 1.0em;
 }
-/* line 55, scss/styles.scss */
+/* line 56, scss/styles.scss */
 #trips-list tr.editing td.current {
   display: none;
 }
+/* line 58, scss/styles.scss */
+#trips-list tr.waiting {
+  opacity: 0.5;
+}
 
-/* line 59, scss/styles.scss */
+/* line 61, scss/styles.scss */
 .tt-header {
   widht: 100%;
   background-color: #5bc0de;
@@ -5926,46 +5931,138 @@ div.alert.alert-warning.savefirst {
   color: #fff;
   text-align: center;
 }
-/* line 60, scss/styles.scss */
+/* line 62, scss/styles.scss */
 .tt-header h1 {
   font-size: 31px;
 }
-/* line 61, scss/styles.scss */
+/* line 63, scss/styles.scss */
 .tt-header p {
   font-size: 20px;
 }
 
-/* line 65, scss/styles.scss */
+/* line 67, scss/styles.scss */
 div.homepage .media {
   text-align: center;
 }
-/* line 66, scss/styles.scss */
+/* line 68, scss/styles.scss */
 div.homepage .media .media-body {
   margin-bottom: 10px;
 }
-/* line 67, scss/styles.scss */
+/* line 69, scss/styles.scss */
 div.homepage .media div.info-media div {
   width: 50%;
   text-align: center;
 }
-/* line 68, scss/styles.scss */
+/* line 70, scss/styles.scss */
 div.homepage .media img.iphone {
   height: 50%;
   width: 50%;
 }
 
+/* Overlay style */
+/* line 77, scss/styles.scss */
+div.overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(50, 169, 205, 0.75);
+}
+/* line 78, scss/styles.scss */
+div.overlay.fullon {
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: opacity 0.5s, visibility 0s 0.5s;
+  transition: opacity 0.5s, visibility 0s 0.5s;
+}
+/* line 79, scss/styles.scss */
+div.overlay.fullon.open {
+  opacity: 1;
+  visibility: visible;
+  -webkit-transition: opacity 0.5s;
+  transition: opacity 0.5s;
+}
+/* line 80, scss/styles.scss */
+div.overlay.fullon.open div.content div {
+  opacity: 1;
+  -webkit-transform: rotateX(0deg);
+  transform: rotateX(0deg);
+}
+/* line 83, scss/styles.scss */
+div.overlay.fullon.close div.content div {
+  opacity: 1;
+  -webkit-transform: rotateX(0deg);
+  transform: rotateX(0deg);
+}
+/* line 85, scss/styles.scss */
+div.overlay.fullon div.content {
+  -webkit-perspective: 1200px;
+  perspective: 1200px;
+}
+/* line 86, scss/styles.scss */
+div.overlay.fullon div.content div {
+  opacity: 0.4;
+  -webkit-transform: translateY(-25%) rotateX(35deg);
+  transform: translateY(-25%) rotateX(35deg);
+  -webkit-transition: -webkit-transform 0.5s, opacity 0.5s;
+  transition: transform 0.5s, opacity 0.5s;
+}
+/* line 89, scss/styles.scss */
+div.overlay .overlay-close {
+  width: 80px;
+  height: 80px;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  overflow: hidden;
+  border: none;
+  background: url(/assets/img/cross.png) no-repeat center center;
+  text-indent: 200%;
+  color: transparent;
+  outline: none;
+  z-index: 10;
+}
+/* line 90, scss/styles.scss */
+div.overlay div.content {
+  text-align: center;
+  position: relative;
+  top: 50%;
+  height: 60%;
+  font-size: 24px;
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+/* line 92, scss/styles.scss */
+div.message {
+  color: #fff;
+  width: 75%;
+  margin: 0 auto;
+  text-align: center;
+  background-color: rgba(50, 169, 205, 0.95);
+  padding: 10px;
+}
+
+@media screen and (max-height: 30.5em) {
+  /* line 96, scss/styles.scss */
+  .overlay div.content {
+    height: 70%;
+    font-size: 16px;
+  }
+}
 @-webkit-keyframes border-pulsate {
-  /* line 73, scss/styles.scss */
+  /* line 102, scss/styles.scss */
   0% {
     background-color: rgba(246, 89, 19, 0);
   }
 
-  /* line 74, scss/styles.scss */
+  /* line 103, scss/styles.scss */
   50% {
     background-color: rgba(246, 89, 19, 0.6);
   }
 
-  /* line 75, scss/styles.scss */
+  /* line 104, scss/styles.scss */
   100% {
     background-color: rgba(246, 89, 19, 0);
   }
