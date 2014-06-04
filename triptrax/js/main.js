@@ -4,6 +4,17 @@
  * Date: 5/14/14
  * Time: 3:22 PM
  */
+var tableToExcel = (function() {
+  var uri = 'data:application/vnd.ms-excel;base64,'
+    , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
+    , base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }
+    , format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) };
+  return function(table, name) {
+    if (!table.nodeType) table = document.getElementById(table);
+    var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML};
+    window.location.href = uri + base64(format(template, ctx));
+};
+})();
 
 $(function() {
 
@@ -249,7 +260,8 @@ $(function() {
         events: {
             "click .new": "newTrip",
             "click .log-out": "logOut",
-            "click a.pagination": "goToPage"
+            "click a.pagination": "goToPage",
+            "click button.export": "openExportDialog"
         },
 
         el: $(".container"),
@@ -307,7 +319,7 @@ $(function() {
 
         render: function() {
             this.modal.init($('button.overlay-close'));
-            var _currentYear = new Date().getFullYear(); console.log(_currentYear);
+            var _currentYear = new Date().getFullYear();
             Parse.Cloud.run('totalMileage', { userid: Parse.User.current().id, year: _currentYear }, {
               success: function (result) { $("#mileage-total").html(result + " miles"); }});
         },
@@ -381,38 +393,84 @@ $(function() {
             this.querySkip = (pageNum - 1) * this.queryLimit;
             this.currentPage = pageNum;
             this.paginationAndFetch();
+        },
+
+        export: function () {
+            var _linkText = $(this).html();
+            $(this).html('<i class="fa fa-spinner fa-spin"></i>');
+            var _today = new Date();
+            var _range = $(this).attr('data-range');
+            var _curYear = _today.getFullYear();
+            var _lastYear = _curYear - 1;
+
+            var startDate, endDate, filename;
+
+            switch (_range) {
+                case "lastyear":
+                    startDate = new Date( _lastYear + "-01-01 00:00:00");
+                    endDate = new Date( _lastYear + "-12-31 23:59:59");
+                    filename = "mileage_" + _lastYear;
+                    break;
+                case "1q":
+                    startDate = new Date( _curYear + "-01-01 00:00:00");
+                    endDate = new Date( _curYear + "-03-31 23:59:59");
+                    filename = "mileage_q1_" + _curYear;
+                    break;
+                case "2q":
+                    startDate = new Date( _curYear + "-04-01 00:00:00");
+                    endDate = new Date( _curYear + "-06-30 23:59:59");
+                    filename = "mileage_q2_" + _curYear;
+                    break;
+                case "3q":
+                    startDate = new Date( _curYear + "-07-01 00:00:00");
+                    endDate = new Date( _curYear + "-09-31 23:59:59");
+                    filename = "mileage_q3_" + _curYear;
+                    break;
+                case "4q":
+                    startDate = new Date( _curYear + "-10-01 00:00:00");
+                    endDate = new Date( _curYear + "-12-31 23:59:59");
+                    filename = "mileage_q4_" + _curYear;
+                    break;
+            }
+
+            var self = this;
+            var csvData = "";
+            Parse.Cloud.run("exportDataByDateRange", { userid: Parse.User.current().id, start: startDate, end: endDate }, {
+                success: function (result) {
+                  if (result.status === "error") {
+                      var _alert = $(self).siblings("div.alert-danger");
+                      _alert.text(result.message).removeClass("fadedout");
+                      $(self).html(_linkText);
+                      setTimeout(function() { _alert.addClass("fadedout"); }, 4000);
+                      return;
+                  }
+
+                csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(result.data);
+                $(self).attr({
+                    'download': filename + ".csv",
+                    'href': csvData
+                });
+                $(self).removeClass("btn-info");
+                $(self).addClass("btn-success");
+                $(self).text("Download File");
+                $(self).one('click', function () {
+                    $(this).html(_linkText);
+                    $(this).removeClass("btn-success").addClass('btn-info');
+                });
+              },
+              error: function (error) {
+                console.log(error);
+              }
+            });
+        },
+
+        openExportDialog: function () {
+            var _exportDiv = $("div#export");
+            this.modal.toggleModal(_exportDiv);
+            _exportDiv.find("a.btn-info").one('click', this.export);
+            _exportDiv.find("button.cancel").one('click', this.modal.toggleModal);
         }
-        // ,
-        //
-        // toggleModal: function () {
-        //     var _transitions = this.support.transitions,
-        //         _overlay = this.overlay,
-        //         _supporTrans = this.support.transitions,
-        //         _transEndEventName = this.transEndEventName;
-        //
-        //     if( _overlay.hasClass('open') ) {
-        //         console.log("closing");
-        //         _overlay.removeClass('open');
-        //         _overlay.addClass('close');
-        //         var onEndTransitionFn = function( ev ) {
-        //             if( _transitions ) {
-        //                 if( ev.propertyName !== 'visibility' ) return;
-        //                 this.removeEventListener( _transEndEventName, onEndTransitionFn );
-        //             }
-        //             _overlay.removeClass('close');
-        //         };
-        //
-        //         if( _supporTrans ) {
-        //             _overlay.on( _transEndEventName, onEndTransitionFn );
-        //         } else {
-        //             onEndTransitionFn();
-        //         }
-        //     } else if( _overlay.hasClass('close') ) {
-        //         console.log("opening");
-        //         _overlay.removeClass('close');
-        //         _overlay.addClass('open');
-        //     }
-        // }
+
     });
 
     // The Application
