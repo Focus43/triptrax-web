@@ -9,4 +9,4 @@ url: "http://yourdomain.com"
 markdown: kramdown
 permalink: pretty
 
-exclude: ['*.json', 'Gruntfile.js', 'config.rb', 'node_modules',  'stylesheets', 'js', 'vagrant']
+exclude: ['*.json', 'Gruntfile.js', 'config.rb', 'node_modules',  'stylesheets', 'js', 'vagrant', 'F43CloudCode']

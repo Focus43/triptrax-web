@@ -108,6 +108,7 @@ module.exports = function(grunt) {
         jshint: {
             options: {
 //                curly: true,
+                laxcomma: true,
                 eqeqeq: true,
                 immed: true,
                 latedef: true,
@@ -127,7 +128,8 @@ module.exports = function(grunt) {
                     Backbone: true,
                     _: true,
                     Modernizr: true,
-                    Modal: true
+                    Modal: true,
+                    unescape: true
                 }
             },
 //            all: ['Gruntfile.js', 'js/*.js'],

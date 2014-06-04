@@ -5881,47 +5881,41 @@ div.login .login-form .btn, div.login .signup-form .btn {
   font-weight: bold;
 }
 
-/* line 39, scss/styles.scss */
-div.alert.alert-warning.savefirst {
-  float: left;
-  width: 70%;
-}
-
-/* line 42, scss/styles.scss */
+/* line 41, scss/styles.scss */
 #trips-list tr.saveme {
   -webkit-animation: border-pulsate 2s;
   -webkit-animation-iteration-count: 1;
 }
-/* line 46, scss/styles.scss */
+/* line 45, scss/styles.scss */
 #trips-list tr td.change {
   display: none;
 }
-/* line 48, scss/styles.scss */
+/* line 47, scss/styles.scss */
 #trips-list tr.editing td.change {
   display: table-cell;
 }
-/* line 50, scss/styles.scss */
+/* line 49, scss/styles.scss */
 #trips-list tr.editing td.change .input-group span {
   font-size: 12px;
 }
-/* line 52, scss/styles.scss */
+/* line 51, scss/styles.scss */
 #trips-list tr.editing td.change .btn {
   float: left;
 }
-/* line 53, scss/styles.scss */
+/* line 52, scss/styles.scss */
 #trips-list tr.editing td.change .btn i.fa {
   font-size: 1.0em;
 }
-/* line 56, scss/styles.scss */
+/* line 55, scss/styles.scss */
 #trips-list tr.editing td.current {
   display: none;
 }
-/* line 58, scss/styles.scss */
+/* line 57, scss/styles.scss */
 #trips-list tr.waiting {
   opacity: 0.5;
 }
 
-/* line 61, scss/styles.scss */
+/* line 60, scss/styles.scss */
 .tt-header {
   widht: 100%;
   background-color: #5bc0de;
@@ -5931,36 +5925,56 @@ div.alert.alert-warning.savefirst {
   color: #fff;
   text-align: center;
 }
-/* line 62, scss/styles.scss */
+/* line 61, scss/styles.scss */
 .tt-header h1 {
   font-size: 31px;
 }
-/* line 63, scss/styles.scss */
+/* line 62, scss/styles.scss */
 .tt-header p {
   font-size: 20px;
 }
 
-/* line 67, scss/styles.scss */
+/* line 66, scss/styles.scss */
 div.homepage .media {
   text-align: center;
 }
-/* line 68, scss/styles.scss */
+/* line 67, scss/styles.scss */
 div.homepage .media .media-body {
   margin-bottom: 10px;
 }
-/* line 69, scss/styles.scss */
+/* line 68, scss/styles.scss */
 div.homepage .media div.info-media div {
   width: 50%;
   text-align: center;
 }
-/* line 70, scss/styles.scss */
+/* line 69, scss/styles.scss */
 div.homepage .media img.iphone {
   height: 50%;
   width: 50%;
 }
 
+/* line 74, scss/styles.scss */
+div.alert {
+  font-size: 16px;
+}
+/* line 75, scss/styles.scss */
+div.alert.fadedout {
+  opacity: 0 !important;
+  padding: 0;
+  margin: 0;
+  border: none;
+  opacity: 0;
+  font-size: 0;
+}
+
+/* line 78, scss/styles.scss */
+div.alert.alert-warning.savefirst {
+  float: left;
+  width: 70%;
+}
+
 /* Overlay style */
-/* line 77, scss/styles.scss */
+/* line 83, scss/styles.scss */
 div.overlay {
   position: fixed;
   width: 100%;
@@ -5969,38 +5983,38 @@ div.overlay {
   left: 0;
   background: rgba(50, 169, 205, 0.75);
 }
-/* line 78, scss/styles.scss */
+/* line 84, scss/styles.scss */
 div.overlay.fullon {
   opacity: 0;
   visibility: hidden;
   -webkit-transition: opacity 0.5s, visibility 0s 0.5s;
   transition: opacity 0.5s, visibility 0s 0.5s;
 }
-/* line 79, scss/styles.scss */
+/* line 85, scss/styles.scss */
 div.overlay.fullon.open {
   opacity: 1;
   visibility: visible;
-  -webkit-transition: opacity 0.5s;
-  transition: opacity 0.5s;
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
 }
-/* line 80, scss/styles.scss */
+/* line 86, scss/styles.scss */
 div.overlay.fullon.open div.content div {
   opacity: 1;
   -webkit-transform: rotateX(0deg);
   transform: rotateX(0deg);
 }
-/* line 83, scss/styles.scss */
+/* line 89, scss/styles.scss */
 div.overlay.fullon.close div.content div {
   opacity: 1;
   -webkit-transform: rotateX(0deg);
   transform: rotateX(0deg);
 }
-/* line 85, scss/styles.scss */
+/* line 91, scss/styles.scss */
 div.overlay.fullon div.content {
   -webkit-perspective: 1200px;
   perspective: 1200px;
 }
-/* line 86, scss/styles.scss */
+/* line 92, scss/styles.scss */
 div.overlay.fullon div.content div {
   opacity: 0.4;
   -webkit-transform: translateY(-25%) rotateX(35deg);
@@ -6008,7 +6022,13 @@ div.overlay.fullon div.content div {
   -webkit-transition: -webkit-transform 0.5s, opacity 0.5s;
   transition: transform 0.5s, opacity 0.5s;
 }
-/* line 89, scss/styles.scss */
+/* line 93, scss/styles.scss */
+div.overlay.fullon div.content div#export a.btn {
+  width: 33%;
+  float: left;
+  margin-bottom: 1px;
+}
+/* line 96, scss/styles.scss */
 div.overlay .overlay-close {
   width: 80px;
   height: 80px;
@@ -6023,7 +6043,7 @@ div.overlay .overlay-close {
   outline: none;
   z-index: 10;
 }
-/* line 90, scss/styles.scss */
+/* line 97, scss/styles.scss */
 div.overlay div.content {
   text-align: center;
   position: relative;
@@ -6034,7 +6054,7 @@ div.overlay div.content {
   transform: translateY(-50%);
 }
 
-/* line 92, scss/styles.scss */
+/* line 99, scss/styles.scss */
 div.message {
   color: #fff;
   width: 75%;
@@ -6045,24 +6065,24 @@ div.message {
 }
 
 @media screen and (max-height: 30.5em) {
-  /* line 96, scss/styles.scss */
+  /* line 104, scss/styles.scss */
   .overlay div.content {
     height: 70%;
     font-size: 16px;
   }
 }
 @-webkit-keyframes border-pulsate {
-  /* line 102, scss/styles.scss */
+  /* line 110, scss/styles.scss */
   0% {
     background-color: rgba(246, 89, 19, 0);
   }
 
-  /* line 103, scss/styles.scss */
+  /* line 111, scss/styles.scss */
   50% {
     background-color: rgba(246, 89, 19, 0.6);
   }
 
-  /* line 104, scss/styles.scss */
+  /* line 112, scss/styles.scss */
   100% {
     background-color: rgba(246, 89, 19, 0);
   }
