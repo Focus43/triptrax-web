@@ -17,7 +17,6 @@ function Modal () {
     };
 
     this.toggleModal = function ( elm ) {
-        console.log(elm);
         var _transitions = Modal.support.transitions,
             _overlay = Modal.overlay,
             _supporTrans = Modal.support.transitions,

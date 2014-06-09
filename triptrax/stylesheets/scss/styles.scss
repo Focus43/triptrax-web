@@ -45,7 +45,7 @@ div.login { text-align: center;
   tr td.change { display: none; }
   tr.editing {
     td.change { display: table-cell;
-      .input-group {
+      .input-group { z-index: 0;
         span { font-size: 12px; }
       }
       .btn { float: left;
@@ -90,7 +90,8 @@ div.overlay { position: fixed;width: 100%;height: 100%;top: 0;left: 0; backgroun
         }
         div.content { -webkit-perspective: 1200px;perspective: 1200px;
             div { opacity: 0.4;-webkit-transform: translateY(-25%) rotateX(35deg);transform: translateY(-25%) rotateX(35deg);-webkit-transition: -webkit-transform 0.5s, opacity 0.5s;transition: transform 0.5s, opacity 0.5s;}
-            div#export a.btn { width: 33%; float: left;margin-bottom: 1px; }
+            div#export a.btn { width: 50%; float: left;margin-bottom: 2px; }
+            div#export a.btn.daterangechooser { width: 100%;  }
         }
     }
     .overlay-close { width: 80px; height: 80px;position: absolute;right: 20px;top: 20px;overflow: hidden;border: none;background: url(/assets/img/cross.png) no-repeat center center;text-indent: 200%;color: transparent;outline: none;z-index: 10; }

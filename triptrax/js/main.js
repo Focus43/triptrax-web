@@ -395,68 +395,92 @@ $(function() {
             this.paginationAndFetch();
         },
 
-        export: function () {
-            var _linkText = $(this).html();
-            $(this).html('<i class="fa fa-spinner fa-spin"></i>');
-            var _today = new Date();
-            var _range = $(this).attr('data-range');
-            var _curYear = _today.getFullYear();
-            var _lastYear = _curYear - 1;
+        export: function ( start, end, downloadElm ) {
 
-            var startDate, endDate, filename;
+            var startDate, endDate, filename, _linkText, self;
+            // get dates
+            if ( start && end ) {
+                startDate = start.toDate();
+                endDate = end.toDate();
+                filename = "custom_" + start.toISOString() + "--" + end.toISOString();
+            } else {
+                var _today = new Date();
+                var _range = $(this).attr('data-range');
+                var _curYear = _today.getFullYear();
+                var _lastYear = _curYear - 1;
 
-            switch (_range) {
-                case "lastyear":
-                    startDate = new Date( _lastYear + "-01-01 00:00:00");
-                    endDate = new Date( _lastYear + "-12-31 23:59:59");
-                    filename = "mileage_" + _lastYear;
-                    break;
-                case "1q":
-                    startDate = new Date( _curYear + "-01-01 00:00:00");
-                    endDate = new Date( _curYear + "-03-31 23:59:59");
-                    filename = "mileage_q1_" + _curYear;
-                    break;
-                case "2q":
-                    startDate = new Date( _curYear + "-04-01 00:00:00");
-                    endDate = new Date( _curYear + "-06-30 23:59:59");
-                    filename = "mileage_q2_" + _curYear;
-                    break;
-                case "3q":
-                    startDate = new Date( _curYear + "-07-01 00:00:00");
-                    endDate = new Date( _curYear + "-09-31 23:59:59");
-                    filename = "mileage_q3_" + _curYear;
-                    break;
-                case "4q":
-                    startDate = new Date( _curYear + "-10-01 00:00:00");
-                    endDate = new Date( _curYear + "-12-31 23:59:59");
-                    filename = "mileage_q4_" + _curYear;
-                    break;
+                switch ( _range ) {
+                    case "lastyear":
+                        startDate = new Date( _lastYear + "-01-01 00:00:00");
+                        endDate = new Date( _lastYear + "-12-31 23:59:59");
+                        filename = "mileage_" + _lastYear;
+                        break;
+                    case "1q":
+                        startDate = new Date( _curYear + "-01-01 00:00:00");
+                        endDate = new Date( _curYear + "-03-31 23:59:59");
+                        filename = "mileage_q1_" + _curYear;
+                        break;
+                    case "2q":
+                        startDate = new Date( _curYear + "-04-01 00:00:00");
+                        endDate = new Date( _curYear + "-06-30 23:59:59");
+                        filename = "mileage_q2_" + _curYear;
+                        break;
+                    case "3q":
+                        startDate = new Date( _curYear + "-07-01 00:00:00");
+                        endDate = new Date( _curYear + "-09-31 23:59:59");
+                        filename = "mileage_q3_" + _curYear;
+                        break;
+                    case "4q":
+                        startDate = new Date( _curYear + "-10-01 00:00:00");
+                        endDate = new Date( _curYear + "-12-31 23:59:59");
+                        filename = "mileage_q4_" + _curYear;
+                        break;
+                }
             }
 
-            var self = this;
+            // update UI
+            if ( downloadElm ) {
+                _linkText = $(downloadElm).html();
+                $(downloadElm).html('<i class="fa fa-spinner fa-spin"></i>');
+                self = $(downloadElm);
+            } else {
+                _linkText = $(this).html();
+                $(this).html('<i class="fa fa-spinner fa-spin"></i>');
+                self = this;
+            }
+
             var csvData = "";
             Parse.Cloud.run("exportDataByDateRange", { userid: Parse.User.current().id, start: startDate, end: endDate }, {
                 success: function (result) {
-                  if (result.status === "error") {
+                    if (result.status === "error") {
                       var _alert = $(self).siblings("div.alert-danger");
                       _alert.text(result.message).removeClass("fadedout");
                       $(self).html(_linkText);
                       setTimeout(function() { _alert.addClass("fadedout"); }, 4000);
                       return;
-                  }
+                    }
+                    csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(result.data);
+                    $(self).attr({
+                        'download': filename + ".csv",
+                        'href': csvData
+                    });
 
-                csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(result.data);
-                $(self).attr({
-                    'download': filename + ".csv",
-                    'href': csvData
-                });
-                $(self).removeClass("btn-info");
-                $(self).addClass("btn-success");
-                $(self).text("Download File");
-                $(self).one('click', function () {
-                    $(this).html(_linkText);
-                    $(this).removeClass("btn-success").addClass('btn-info');
-                });
+                    $(self).removeClass("btn-info");
+                    $(self).addClass("btn-success");
+                    $(self).text("Download File");
+
+                    $(self).one('click', function () {
+                        $(this).removeClass("btn-success").addClass('btn-info');
+                        if ( $(this).hasClass("daterange") ) {
+                            setTimeout( function() {
+                                $(self).removeAttr("href");
+                                $(self).removeAttr("download");
+                            }, 1000);
+                            $(this).html(_linkText);
+                        } else {
+                            $(this).html(_linkText + ' <small>(Download)</small>');
+                        }
+                    });
               },
               error: function (error) {
                 console.log(error);
@@ -467,10 +491,44 @@ $(function() {
         openExportDialog: function () {
             var _exportDiv = $("div#export");
             this.modal.toggleModal(_exportDiv);
-            _exportDiv.find("a.btn-info").one('click', this.export);
-            _exportDiv.find("button.cancel").one('click', this.modal.toggleModal);
-        }
 
+            _exportDiv.find("a.btn-info.preset").one('click', this.export);
+
+            _exportDiv.find("a.btn-info.daterange").on('click', function () {
+                var _dateChooser = _exportDiv.find("a.btn.daterangechooser");
+                if ( _dateChooser.hasClass('hidden') ) {
+                    _dateChooser.removeClass('hidden');
+                } else {
+                    _dateChooser.addClass('hidden');
+                }
+            });
+            var self = this;
+            this.setUpDatePicker( self );
+
+            _exportDiv.find("button.cancel").one('click', this.modal.toggleModal);
+        },
+
+        setUpDatePicker: function ( context ) {
+            var _exportDiv = $("div#export");
+            _exportDiv.find("a.btn.daterangechooser").daterangepicker(
+                {
+                  ranges: {
+                     'Today': [moment(), moment()],
+                     'Yesterday': [moment().subtract('days', 1), moment().subtract('days', 1)],
+                     'Last 7 Days': [moment().subtract('days', 6), moment()],
+                     'Last 30 Days': [moment().subtract('days', 29), moment()],
+                     'This Month': [moment().startOf('month'), moment().endOf('month')],
+                     'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+                  },
+                  startDate: moment().subtract('days', 29),
+                  endDate: moment()
+                },
+                function(start, end) {
+                    _exportDiv.find("a.btn.daterangechooser span").html(start.format('MM/DD/YYYY') + ' - ' + end.format('MM/DD/YYYY'));
+                    context.export(start, end, '#export a.btn-info.daterange');
+                }
+            );
+        }
     });
 
     // The Application

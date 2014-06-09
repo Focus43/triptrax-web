@@ -656,7 +656,6 @@ var Zepto = (function() {
         height: Math.round(obj.height)
       }
     },
-
     css: function(property, value){
       if (arguments.length < 2) {
         var element = this[0], computedStyle = getComputedStyle(element, '')

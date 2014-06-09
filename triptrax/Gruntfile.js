@@ -21,14 +21,17 @@ module.exports = function(grunt) {
                     destPrefix: 'js/libs'
                 },
                 files: {
-                    'zepto/zepto.js': 'zeptojs/src/zepto.js',
-                    'zepto/event.js': 'zeptojs/src/event.js',
-                    'zepto/ie.js': 'zeptojs/src/ie.js',
-                    'zepto/form.js': 'zeptojs/src/form.js',
-                    'zepto/ajax.js': 'zeptojs/src/ajax.js',
-                    'zepto/data.js': 'zeptojs/src/data.js',
+                    // 'zepto/zepto.js': 'zeptojs/src/zepto.js',
+                    // 'zepto/event.js': 'zeptojs/src/event.js',
+                    // 'zepto/ie.js': 'zeptojs/src/ie.js',
+                    // 'zepto/form.js': 'zeptojs/src/form.js',
+                    // 'zepto/ajax.js': 'zeptojs/src/ajax.js',
+                    // 'zepto/data.js': 'zeptojs/src/data.js',
+                    'jquery.min.js': 'jquery/dist/jquery.min.js',
                     'bootstrap.min.js': 'bootstrap-css/js/bootstrap.min.js',
-                    'underscore.js': 'underscore/underscore.js'
+                    'underscore.js': 'underscore/underscore.js',
+                    'moment.js': 'momentjs/moment.js',
+                    'bootstrap-daterangepicker.js': 'bootstrap-daterangepicker/daterangepicker.js'
                 }
             },
             scss: {
@@ -37,7 +40,8 @@ module.exports = function(grunt) {
                 },
                 files: {
                     'scss/font-awesome': 'components-font-awesome/scss',
-                    'bootstrap.css': 'bootstrap-css/css/bootstrap.css'
+                    'bootstrap.css': 'bootstrap-css/css/bootstrap.css',
+                    'daterangepicker.css': 'bootstrap-daterangepicker/daterangepicker-bs3.css'
                 }
             },
             folders: {
@@ -62,15 +66,19 @@ module.exports = function(grunt) {
             },
             build: {
                 src: [
-                    'js/libs/zepto/zepto.js',
-                    'js/libs/zepto/ie.js',
-                    'js/libs/zepto/event.js',
-                    'js/libs/zepto/form.js',
-                    'js/libs/zepto/ajax.js',
-                    'js/libs/zepto/data.js',
+                    // 'js/libs/zepto/zepto.js',
+                    // 'js/libs/zepto/ie.js',
+                    // 'js/libs/zepto/event.js',
+                    // 'js/libs/zepto/form.js',
+                    // 'js/libs/zepto/ajax.js',
+                    // 'js/libs/zepto/data.js',
+                    'js/libs/jquery.min.js',
                     'js/libs/underscore.js',
                     'js/libs/parse-1.2.18.js',
                     'js/libs/bootstrap.min.js',
+                    'js/libs/bootstrap.min.js',
+                    'js/libs/moment.js',
+                    'js/libs/bootstrap-daterangepicker.js',
                     'js/libs/modernizr.custom.js',
                     'js/addons.js',
                     'js/modal.js',
@@ -129,7 +137,8 @@ module.exports = function(grunt) {
                     _: true,
                     Modernizr: true,
                     Modal: true,
-                    unescape: true
+                    unescape: true,
+                    moment: true
                 }
             },
 //            all: ['Gruntfile.js', 'js/*.js'],

@@ -49,7 +49,7 @@ Parse.Cloud.define('exportDataByDateRange', function ( request, response ) {
             }
             var _headerNames = ["Title", "Date", "Start", "End", "Trip Total"];
             var _colDelim = '","',
-                _rowDelim = '"\r\n"';
+                _rowDelim = '"\r\n';
             var csv = "\"";
             csv +=  _headerNames.join(_colDelim);
             csv += _rowDelim;
@@ -63,7 +63,6 @@ Parse.Cloud.define('exportDataByDateRange', function ( request, response ) {
                 csv += results[i].get("endOdometer") - results[i].get("startOdometer");
                 csv += _rowDelim;
             }
-
             response.success( { status: "success", data: csv } );
         },
         error: function() {

@@ -15,14 +15,15 @@
     </div>
 
     <div id="export" class="hidden message">
-        Choose date range:<br>
+        Choose date range:<br><br>
         <div class="alert alert-danger fadedout"></div>
-        <a class="btn btn-info" data-range="lastyear">Last Year</a>
-        <a class="btn btn-info" data-range="1q">First Quarter</a>
-        <a class="btn btn-info" data-range="2q">Second Quarter</a>
-        <a class="btn btn-info" data-range="3q">Third Quarter</a>
-        <a class="btn btn-info" data-range="4q">Fourth Quarter</a>
-        <!-- <a class="btn btn-info" data-range="4q">Custom Dates</a> -->
+        <a class="btn btn-info preset" data-range="lastyear">Last Year</a>
+        <a class="btn btn-info preset" data-range="1q">First Quarter</a>
+        <a class="btn btn-info preset" data-range="2q">Second Quarter</a>
+        <a class="btn btn-info preset" data-range="3q">Third Quarter</a>
+        <a class="btn btn-info preset" data-range="4q">Fourth Quarter</a>
+        <a class="btn btn-info daterange" data-range="custom">Custom Date Range</a><br>
+        <a class="btn btn-default daterangechooser hidden" data-range="custom"><span>Choose Dates </span> <i class="fa fa-lg fa-calendar"></i></a>
         <br><br>
         <button type="button" class="btn btn-warning cancel">Never Mind</button>
     </div>
