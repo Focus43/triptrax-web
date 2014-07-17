@@ -1,11 +1,5 @@
 
-// Use Parse.Cloud.define to define as many cloud functions as you want.
-// For example:
-Parse.Cloud.define("hello", function(request, response) {
-  response.success("Hello world!");
-});
-
-// GET TOTAL MILEAGE FOR USER
+/// GET TOTAL MILEAGE FOR USER
 Parse.Cloud.define("totalMileage", function( request, response ) {
   var user = new Parse.User();
   user.id = request.params.userid;

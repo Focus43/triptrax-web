@@ -65,8 +65,10 @@ $(function() {
     // -----------------
     var LogInView = Parse.View.extend({
         events: {
-            "click .btn.login": "logIn",
-            "click .btn.signup": "signUp"
+            "click .btn.login":          "logIn",
+            "click .btn.signup":         "signUp",
+            "click a.forgot-password":   "showLostPasswordForm",
+            "click .btn.retrieve":       "retrievePassword"
         },
 
         el: ".container",
@@ -118,6 +120,26 @@ $(function() {
             this.$(".signup-form button").attr("disabled", "disabled");
 
             return false;
+        },
+
+        showLostPasswordForm: function() {
+            $("input#user-email").show();
+            $(".btn.retrieve").show();
+        },
+
+        retrievePassword: function() {
+            $(".lostpwd-form .alert").hide();
+            Parse.User.requestPasswordReset( $("input#user-email").val(), {
+                success: function(data) {
+                    // Password reset request was sent successfully
+                    var _message = "An email with instructions have been sent to " + $("input#user-email").val();
+                    $(".lostpwd-form .alert-success").html(_message).show();
+                },
+                error: function(error) {
+                    // Show the error message
+                    $(".lostpwd-form .alert-danger").html(error.message).show();
+                }
+            });
         },
 
         render: function() {
