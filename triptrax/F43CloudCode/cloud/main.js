@@ -9,8 +9,8 @@ Parse.Cloud.define("lastTripEndodometer", function( request, response ) {
   query.descending("createdAt");
   query.limit(1);
   query.find({
-    success: function(result) {
-      response.success( result.endOdometer );
+    success: function(results) {
+      response.success( results );
     },
     error: function() {
       response.error("trip lookup failed" + _date);
