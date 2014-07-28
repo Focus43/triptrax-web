@@ -1,6 +1,6 @@
 
 // GET LAST LOGGED TRIP
-Parse.Cloud.define("lastTrip", function( request, response ) {
+Parse.Cloud.define("lastTripEndodometer", function( request, response ) {
   var user = new Parse.User();
   user.id = request.params.userid;
   var query = new Parse.Query("Trip");
@@ -9,8 +9,8 @@ Parse.Cloud.define("lastTrip", function( request, response ) {
   query.descending("createdAt");
   query.limit(1);
   query.find({
-    success: function(results) {
-      response.success( results );
+    success: function(result) {
+      response.success( result.endOdometer );
     },
     error: function() {
       response.error("trip lookup failed" + _date);
