@@ -1,5 +1,24 @@
 
-/// GET TOTAL MILEAGE FOR USER
+// GET LAST LOGGED TRIP
+Parse.Cloud.define("lastTrip", function( request, response ) {
+  var user = new Parse.User();
+  user.id = request.params.userid;
+  var query = new Parse.Query("Trip");
+  query.include('user');
+  query.equalTo("user", user);
+  query.descending("createdAt");
+  query.limit(1);
+  query.find({
+    success: function(results) {
+      response.success( results );
+    },
+    error: function() {
+      response.error("trip lookup failed" + _date);
+    }
+  });
+});
+
+// GET TOTAL MILEAGE FOR USER
 Parse.Cloud.define("totalMileage", function( request, response ) {
   var user = new Parse.User();
   user.id = request.params.userid;
