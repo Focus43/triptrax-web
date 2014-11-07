@@ -43,43 +43,68 @@ Parse.Cloud.define("totalMileage", function( request, response ) {
 
 // EXPORT DATA BASED ON DATE RANGE
 Parse.Cloud.define('exportDataByDateRange', function ( request, response ) {
-    var user = new Parse.User();
-    user.id = request.params.userid;
-    var query = new Parse.Query("Trip");
-    query.include('user');
-    query.equalTo("user", user);
 
-    var _startDate = new Date (request.params.start),
-        _endDate = new Date (request.params.end);
-    query.greaterThanOrEqualTo("date", _startDate);
-    query.lessThanOrEqualTo("date", _endDate);
+    var userQuery = new Parse.Query(Parse.User);
+    userQuery.get(request.params.userid, {
+        success: function( user ) {
 
-    query.find({
-        success: function(results) {
-            if ( results.length < 1 ) {
-                response.success( { status: "error", message: "There are no trips stored for that time period." } );
-                return;
-            }
-            var _headerNames = ["Title", "Date", "Start", "End", "Trip Total"];
-            var _colDelim = '","',
-                _rowDelim = '"\r\n';
-            var csv = "\"";
-            csv +=  _headerNames.join(_colDelim);
-            csv += _rowDelim;
+            var query = new Parse.Query("Trip");
+            query.include('user');
+            query.equalTo("user", user);
+            var lengthUnit = user.get('lengthUnit');
+            var divisor = (lengthUnit == "miles") ? 1609.344 : 1000;
+            var _startDate = new Date (request.params.start),
+                _endDate = new Date (request.params.end);
+            query.greaterThanOrEqualTo("date", _startDate);
+            query.lessThanOrEqualTo("date", _endDate);
 
-            for ( var i = 0; i < results.length; ++i ) {
-                csv += results[i].get("title").replace('"', '""') + _colDelim;
-                var _date = results[i].get("date");
-                csv += (_date.getMonth() + 1) + "/" + _date.getDate() + "/" + _date.getFullYear() + _colDelim;
-                csv += results[i].get("startOdometer") + _colDelim;
-                csv += results[i].get("endOdometer") + _colDelim;
-                csv += results[i].get("endOdometer") - results[i].get("startOdometer");
-                csv += _rowDelim;
-            }
-            response.success( { status: "success", data: csv } );
+            query.find({
+                success: function(results) {
+                    if ( results.length < 1 ) {
+                        response.success( { status: "error", message: "There are no trips stored for that time period." } );
+                        return;
+                    }
+
+                    var _headerNames = ["Title", "Date", "Start", "End", "Trip Total (" + lengthUnit + ")", "Method"];
+                    var _colDelim = '","',
+                        _rowDelim = '"\r\n';
+                    var csv = "\"";
+                    csv +=  _headerNames.join(_colDelim);
+                    csv += _rowDelim;
+
+                    for ( var i = 0; i < results.length; ++i ) {
+                        var _title = ( results[i].get("title") != "" ) ? results[i].get("title").replace('"', '""') : "< no description >";
+                        csv += '"' + _title + _colDelim;
+                        var _date = results[i].get("date");
+                        csv += (_date.getMonth() + 1) + "/" + _date.getDate() + "/" + _date.getFullYear() + _colDelim;
+                        csv += results[i].get("distance" && results[i].get("distance") >= 0) ? "" + _colDelim : results[i].get("startOdometer") + _colDelim;
+                        csv += results[i].get("distance" && results[i].get("distance") >= 0) ? "" + _colDelim : results[i].get("endOdometer") + _colDelim;
+
+                        if ( results[i].get("distance") && results[i].get("distance") >= 0 ) {
+                            csv += (results[i].get("distance")/divisor).toFixed(2) + _colDelim;
+                        } else {
+                            csv += results[i].get("endOdometer") - results[i].get("startOdometer") + _colDelim;
+                        }
+
+                        if ( results[i].get("distance") && results[i].get("distance") >= 0 ) {
+                            csv += "GPS";
+                        } else {
+                            csv += "Manual";
+                        }
+
+                        csv += _rowDelim;
+                    }
+                    response.success( { status: "success", data: csv } );
+                },
+                error: function() {
+                    response.success( { status: "error", data:"Trip lookup failed. Try again..."} );
+                }
+            });
         },
-        error: function() {
-            response.success( { status: "error", data:"Trip lookup failed. Try again..."} );
+
+        error: function(object, error) {
+            response.success( { status: "error", data:"User lookup failed. Try again..."} );
         }
     });
+
 });

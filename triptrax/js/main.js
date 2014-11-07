@@ -28,7 +28,9 @@ $(function() {
             title: "New Trip",
             date: new Date(),
             startOdometer: 0,
-            endOdometer: 0
+            endOdometer: 0,
+            distance: -1,
+            type: "Business"
         },
 
         // Ensure that each trip created has date and title.
@@ -179,7 +181,6 @@ $(function() {
         // Switch this view into editing
         edit: function() {
             $(this.el).addClass("editing");
-//            this.input.focus();
         },
 
         // Close the editing mode, saving changes to the trip.
@@ -299,8 +300,6 @@ $(function() {
 
             // Modal setup
             this.modal = new Modal();
-
-            // this.allCheckbox = this.$("#toggle-all")[0];
 
             // Create our collection of Todos
             this.trips = new TripsList();
@@ -585,6 +584,25 @@ $(function() {
 });
 
 // Formatters
+_.template.distanceunit = function () {
+    return Parse.User.current().get("lengthUnit");
+};
+
+_.template.formatdistance = function (dist, startOdometer, endOdometer) {
+    var d;
+    if ( dist !== -1 || (endOdometer !== 0 && startOdometer !== 0) ) {
+        d = dist !== -1 ? dist : endOdometer - startOdometer;
+        return d.toLocaleString('en-US', { maximumSignificantDigits: 3 }) + " " + Parse.User.current().get("lengthUnit");
+    } else {
+        return "-";
+    }
+};
+
+_.template.formattype = function (t) {
+    var type = !t ? "business" : t;
+    return "<div class='" + type.toLowerCase() + "'></div>";
+};
+
 _.template.formatdate = function (stamp) {
     var d = new Date(stamp.iso);
     return d.toLocaleDateString();

@@ -21,12 +21,6 @@ module.exports = function(grunt) {
                     destPrefix: 'js/libs'
                 },
                 files: {
-                    // 'zepto/zepto.js': 'zeptojs/src/zepto.js',
-                    // 'zepto/event.js': 'zeptojs/src/event.js',
-                    // 'zepto/ie.js': 'zeptojs/src/ie.js',
-                    // 'zepto/form.js': 'zeptojs/src/form.js',
-                    // 'zepto/ajax.js': 'zeptojs/src/ajax.js',
-                    // 'zepto/data.js': 'zeptojs/src/data.js',
                     'jquery.min.js': 'jquery/dist/jquery.min.js',
                     'bootstrap.min.js': 'bootstrap-css/js/bootstrap.min.js',
                     'underscore.js': 'underscore/underscore.js',
