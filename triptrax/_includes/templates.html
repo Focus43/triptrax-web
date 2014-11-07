@@ -112,7 +112,7 @@
     <td class="current"><%= title %></td>
     <td class="current"><%= startOdometer == 0 ? "-" : startOdometer.toLocaleString('en-US', { maximumSignificantDigits: 3 }) %></td>
     <td class="current"><%= endOdometer == 0 ? "-" : endOdometer.toLocaleString('en-US', { maximumSignificantDigits: 3 }) %></td>
-    <td class="current"><%= _.template.formatdistance(distance, startOdometer, endOdometer) %></td>
+    <td class="current"><%= typeof distance === 'undefined' ? _.template.formatdistance(-1, startOdometer, endOdometer) : _.template.formatdistance(distance, startOdometer, endOdometer) %></td>
 
     <td class="change" colspan="6">
         <form>
