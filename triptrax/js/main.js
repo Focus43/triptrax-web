@@ -604,8 +604,11 @@ _.template.formattype = function (t) {
 };
 
 _.template.formatdate = function (stamp) {
-    var d = new Date(stamp.iso);
-    return d.toLocaleDateString();
+    //var d = new Date(stamp.iso);
+    //return d.toLocaleDateString();
+    var fragments = stamp.iso.split("T");
+    var dateFrag = fragments[0].split("-");
+    return dateFrag[1] + "/" + dateFrag[2] + "/" + dateFrag[0];
 };
 
 _.template.formatdatevalue = function (stamp) {
